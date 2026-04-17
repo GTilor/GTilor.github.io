@@ -763,7 +763,7 @@ post:
     # 指定的插件，需要同时设置对应插件的必要参数
     # The specified plugin needs to set the necessary parameters at the same time
     # Options: utterances | disqus | gitalk | valine | waline | changyan | livere | remark42 | twikoo | cusdis | giscus | discuss
-    type: waline
+    type: twikoo
 
 
 #---------------------------
@@ -892,7 +892,7 @@ remark42:
 # Based on Tencent CloudBase
 # See: https://twikoo.js.org
 twikoo:
-  envId:
+  envId: 'https://comments-final.vercel.app' # 已经为你填好！
   region: ap-shanghai
   path: window.location.pathname
 
