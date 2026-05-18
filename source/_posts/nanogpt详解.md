@@ -189,15 +189,105 @@ weight 初始全是1，bias 初始全是0，训练时通过反向传播自动学
 为什么需要LayerNorm？ 每一层的输出值可能越来越大或越来越小，LayerNorm 把它们拉回到均值 0、方差 1 的范围，让训练更稳定。
 
 ## CausalSelfAttention
+这一层是 nanoGPT 最重要的组成部分，来源于 2017 年 Google 团队的论文 *"Attention Is All You Need"*（Vaswani et al.）。这篇论文提出了 Transformer 架构。
 
+自注意力机制的核心思想是：让序列中的每个 token 去"关注"其他 token，计算它们之间的关系强度，然后按关系强度加权求和，得到每个 token 的新表示。而"因果"（Causal）意味着每个 token 只能看到它前面的 token，不能看到后面的。
 
+其数学表达式为：
+$$\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right) V$$
 
+其中 Q、K、V 都是由输入 $X$ 通过不同的线性变换得到的：
+$$Q = XW^Q, \quad K = XW^K, \quad V = XW^V$$
 
+维度说明（以 GPT-2 small 为例，$B$=batch size，$T$=序列长度，$d_{model}$=768，$h$=12 头，$d_k = d_{model}/h = 64$）：
+- $X \in \mathbb{R}^{B \times T \times d_{model}}$：输入矩阵
+- $W^Q, W^K \in \mathbb{R}^{d_{model} \times d_k}$：Q、K 的投影矩阵
+- $W^V \in \mathbb{R}^{d_{model} \times d_v}$：V 的投影矩阵
+- $Q, K \in \mathbb{R}^{B \times h \times T \times d_k}$：多头形式
+- $QK^T \in \mathbb{R}^{B \times h \times T \times T}$：注意力分数矩阵，每个位置对每个位置的相似度
+- $\text{softmax}(QK^T/\sqrt{d_k})V \in \mathbb{R}^{B \times h \times T \times d_k}$：加权求和结果
 
+- $Q$（查询）：当前位置想要什么信息
+- $K$（键）：每个位置提供什么信息
+- $V$（值）：每个位置的实际内容
+- $QK^T$：计算当前位置和每个位置的相似度
+- $\sqrt{d_k}$：缩放防止数值过大
+- softmax：把相似度变成概率（加起来为1）
+- 乘 $V$：按概率加权求和
 
+具体代码实现如下：
+```python
+class CausalSelfAttention(nn.Module):
+    def __init__(self, config):
+        super().__init__()
+        assert config.n_embd % config.n_head == 0  # 确保维度能被 head 数整除
 
+        # 一次性计算 Q, K, V
+        self.c_attn = nn.Linear(config.n_embd, 3 * config.n_embd, bias=config.bias)
+        self.c_proj = nn.Linear(config.n_embd, config.n_embd, bias=config.bias)
+        self.attn_dropout = nn.Dropout(config.dropout)
+        self.resid_dropout = nn.Dropout(config.dropout)
+        self.n_head = config.n_head
+        self.n_embd = config.n_embd
+        self.dropout = config.dropout
+        self.flash = hasattr(torch.nn.functional, 'scaled_dot_product_attention')
+        if not self.flash:
+            print("WARNING: using slow attention. Flash Attention requires PyTorch >= 2.0")
+            self.register_buffer("bias", torch.tril(torch.ones(config.block_size, config.block_size))
+                                        .view(1, 1, config.block_size, config.block_size))
 
+    def forward(self, x):
+        """
+        前向传播：计算输入 x 的注意力输出。
+        输入: (B, T, C) - 批次大小, 序列长度, embedding维度
+        输出: (B, T, C) - 同形状
+        """
+        B, T, C = x.size()
+        # 一次性计算 Q, K, V然后再拆分
+        q, k, v = self.c_attn(x).split(self.n_embd, dim=2)
+        k = k.view(B, T, self.n_head, C // self.n_head).transpose(1, 2)  
+        q = q.view(B, T, self.n_head, C // self.n_head).transpose(1, 2)  
+        v = v.view(B, T, self.n_head, C // self.n_head).transpose(1, 2)  
+        # 计算注意力
+        if self.flash:
+            # 使用 Flash Attention（高效）
+            y = torch.nn.functional.scaled_dot_product_attention(
+                q, k, v,
+                attn_mask=None,
+                dropout_p=self.dropout if self.training else 0,
+                is_causal=True
+            )
+        else:
+            # 手动实现
+            att = (q @ k.transpose(-2, -1)) * (1.0 / math.sqrt(k.size(-1)))  # 注意力分数
+            att = att.masked_fill(self.bias[:,:,:T,:T] == 0, float('-inf'))  # 因果掩码
+            att = F.softmax(att, dim=-1)  
+            att = self.attn_dropout(att)  
+            y = att @ v  
+        合并多头
+        y = y.transpose(1, 2).contiguous().view(B, T, C)
 
+        # 输出投影
+        y = self.resid_dropout(self.c_proj(y))
+        return y
+```
+上述代码与前面模块的结构类似：首先在 `__init__` 中定义前向传播所需要的参数和函数，然后再在 `forward` 中定义前向传播的过程。
+
+**`__init__` 中的参数：**
+- **`self.c_attn`**：一个 Linear 层，输入 `n_embd` 维，输出 `3*n_embd` 维，一次性算出 Q、K、V 三个向量
+- **`self.c_proj`**：输出投影层，把多头合并后的结果从 `n_embd` 投影回 `n_embd`，融合不同头的信息
+- **`self.attn_dropout`**：在 softmax 之后随机丢弃一些注意力连接，防止过拟合
+- **`self.resid_dropout`**：在输出投影之后随机丢弃一些特征
+
+**前向传播 `forward` 的步骤：**
+1. 通过 `self.c_attn` 算出 Q、K、V，拆分后 reshape 成多头形式 `(B, n_head, T, head_dim)`
+2. 计算注意力分数 $QK^T / \sqrt{d_k}$，得到每个 token 对其他 token 的相似度
+3. 因果掩码：通过下三角矩阵遮挡未来位置。
+4. softmax 归一化：把相似度变成概率分布
+5. 加权求和：用注意力概率对 V 加权求和
+6. 合并多头 + 输出投影：拼接多个头的结果，通过 `self.c_proj` 投影回原始维度
+
+以下我将举一个具体的维度变化的例子进行讲解：数据传输到transformer层的数据结构为（32，1024，768），具体代表着有32个1024长的token串输入到模型内，每个token都可以用1✖️768的一维向量表示。
 
 
 
