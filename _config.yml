@@ -103,7 +103,7 @@ theme: fluid
 deploy:
   type: git
   repo: https://github.com/GTilor/GTilor.github.io.git
-  branch: main
+  branch: gh-pages
 
 # Search
 search:
