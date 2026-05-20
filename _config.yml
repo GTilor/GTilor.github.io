@@ -113,5 +113,4 @@ search:
   format: html
 
 markdown:
-  plugins:
-    - '@traptitech/markdown-it-katex'
+  plugins: []

@@ -879,3 +879,7 @@ python train.py config/train_shakespeare_char.py --device=mps --compile=False
 
 
 
+
+# 预告
+本次博客介绍了一个大模型的简要结构(以nanoGPT为例)，后面我们将丰富这个大模型以便更接近更新的大模型，下一篇博客将从数据处理讲起，预计5🈷24日更新。
+
