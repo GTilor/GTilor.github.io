@@ -19,26 +19,27 @@
   <meta name="author" content="GTilor">
   <meta name="keywords" content="金融、编程、数学">
   
-    <meta name="description" content="终于，我拥有了完全属于自己的独立博客。 作为一名数学研究生，我建立这个博客的初衷非常明确，主要用于记录和分享我在三个领域的思考： 1. 投资理念与心得 这是我创建博客的首要目的。我希望通过文字记录，将自己的投资逻辑系统化。在这里，我会分享：  我对市场周期的个人理解。 具体的投资心。 坚持价值发现与风险控制的投资理念。  2. AI 相关内容学习 作为对未来技术的探索，我会在这里记录学习 AI 的">
+    <meta name="description" content="AI Agent 深度学习指南：从理论到实践  本文精选最值得学习的 Agent 架构模式和开源项目，帮你从零掌握 AI Agent 的核心原理。  一、Agent 的本质 Agent &#x3D; LLM + 工具 + 记忆 + 规划 1用户输入 → LLM 推理 → 选择工具 → 执行 → 观察结果 → 继续推理 → 最终回答 核心能力：  推理：理解问题，制定计划 行动：调用工具，执行操作 记忆：存储">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Hello World：GTilor 的投资与学术空间">
-<meta property="og:url" content="https://gtilor.github.io/2026/04/03/%E6%88%91%E7%9A%84%E7%AC%AC%E4%B8%80%E7%AF%87%E5%8D%9A%E5%AE%A2/index.html">
+<meta property="og:title" content="AI Agent 深度学习指南：从理论到实践">
+<meta property="og:url" content="https://gtilor.github.io/2026/05/30/agent-learning-guide/index.html">
 <meta property="og:site_name" content="GTilor的博客空间">
-<meta property="og:description" content="终于，我拥有了完全属于自己的独立博客。 作为一名数学研究生，我建立这个博客的初衷非常明确，主要用于记录和分享我在三个领域的思考： 1. 投资理念与心得 这是我创建博客的首要目的。我希望通过文字记录，将自己的投资逻辑系统化。在这里，我会分享：  我对市场周期的个人理解。 具体的投资心。 坚持价值发现与风险控制的投资理念。  2. AI 相关内容学习 作为对未来技术的探索，我会在这里记录学习 AI 的">
+<meta property="og:description" content="AI Agent 深度学习指南：从理论到实践  本文精选最值得学习的 Agent 架构模式和开源项目，帮你从零掌握 AI Agent 的核心原理。  一、Agent 的本质 Agent &#x3D; LLM + 工具 + 记忆 + 规划 1用户输入 → LLM 推理 → 选择工具 → 执行 → 观察结果 → 继续推理 → 最终回答 核心能力：  推理：理解问题，制定计划 行动：调用工具，执行操作 记忆：存储">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2026-04-03T01:28:00.000Z">
-<meta property="article:modified_time" content="2026-05-30T05:22:32.578Z">
+<meta property="article:published_time" content="2026-05-30T04:00:00.000Z">
+<meta property="article:modified_time" content="2026-05-30T05:22:32.577Z">
 <meta property="article:author" content="GTilor">
-<meta property="article:tag" content="AI">
-<meta property="article:tag" content="投资">
-<meta property="article:tag" content="数学">
+<meta property="article:tag" content="AI Agent">
+<meta property="article:tag" content="LLM">
+<meta property="article:tag" content="开源项目">
+<meta property="article:tag" content="深度学习">
 <meta name="twitter:card" content="summary_large_image">
   
   
     <meta name="referrer" content="no-referrer-when-downgrade">
   
   
-  <title>Hello World：GTilor 的投资与学术空间 - GTilor的博客空间</title>
+  <title>AI Agent 深度学习指南：从理论到实践 - GTilor的博客空间</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -309,7 +310,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="Hello World：GTilor 的投资与学术空间"></span>
+            <span id="subtitle" data-typed-text="AI Agent 深度学习指南：从理论到实践"></span>
           
         </div>
 
@@ -320,8 +321,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2026-04-03 09:28" pubdate>
-          2026年4月3日 上午
+        <time datetime="2026-05-30 12:00" pubdate>
+          2026年5月30日 中午
         </time>
       </span>
     
@@ -332,7 +333,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          294 字
+          3.9k 字
         
       </span>
     
@@ -343,7 +344,7 @@
         
         
         
-          3 分钟
+          33 分钟
         
       </span>
     
@@ -382,29 +383,365 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">Hello World：GTilor 的投资与学术空间</h1>
+            <h1 id="seo-header">AI Agent 深度学习指南：从理论到实践</h1>
             
             
               <div class="markdown-body">
                 
-                <p>终于，我拥有了完全属于自己的独立博客。</p>
-<p>作为一名数学研究生，我建立这个博客的初衷非常明确，主要用于记录和分享我在三个领域的思考：</p>
-<h3 id="1-投资理念与心得">1. 投资理念与心得</h3>
-<p>这是我创建博客的首要目的。我希望通过文字记录，将自己的投资逻辑系统化。在这里，我会分享：</p>
+                <h1 id="ai-agent-深度学习指南：从理论到实践">AI Agent 深度学习指南：从理论到实践</h1>
+<blockquote>
+<p>本文精选最值得学习的 Agent 架构模式和开源项目，帮你从零掌握 AI Agent 的核心原理。</p>
+</blockquote>
+<h2 id="一、Agent-的本质">一、Agent 的本质</h2>
+<p><strong>Agent = LLM + 工具 + 记忆 + 规划</strong></p>
+<figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs mipsasm">用户输入 → <span class="hljs-keyword">LLM </span>推理 → 选择工具 → 执行 → 观察结果 → 继续推理 → 最终回答<br></code></pre></td></tr></table></figure>
+<p>核心能力：</p>
 <ul>
-<li>我对市场周期的个人理解。</li>
-<li>具体的投资心。</li>
-<li>坚持价值发现与风险控制的投资理念。</li>
+<li><strong>推理</strong>：理解问题，制定计划</li>
+<li><strong>行动</strong>：调用工具，执行操作</li>
+<li><strong>记忆</strong>：存储上下文，长期学习</li>
+<li><strong>规划</strong>：分解任务，分步执行</li>
 </ul>
-<h3 id="2-AI-相关内容学习">2. AI 相关内容学习</h3>
-<p>作为对未来技术的探索，我会在这里记录学习 AI 的全过程，包括：</p>
+<hr>
+<h2 id="二、Agent-的-4-种核心工作模式">二、Agent 的 4 种核心工作模式</h2>
+<h3 id="1-ReAct（推理-行动）">1. ReAct（推理 + 行动）</h3>
+<p><strong>核心思想</strong>：思考-行动-观察循环</p>
+<figure class="highlight avrasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs avrasm">用户: 北京天气怎么样？<br><br><span class="hljs-symbol">Thought:</span> 我需要查询北京的天气信息<br><span class="hljs-symbol">Action:</span> search_weather(<span class="hljs-string">&quot;北京&quot;</span>)<br><span class="hljs-symbol">Observation:</span> 北京今天晴，<span class="hljs-number">25</span>°C<br><span class="hljs-symbol">Thought:</span> 我已经获得答案了<br><span class="hljs-symbol">Answer:</span> 北京今天晴天，气温<span class="hljs-number">25</span>°C<br></code></pre></td></tr></table></figure>
+<p><strong>适用场景</strong>：简单问答、信息检索、单步操作</p>
+<p><strong>学习价值</strong>：⭐⭐⭐⭐⭐（必须掌握）</p>
+<hr>
+<h3 id="2-Plan-and-Execute（规划-执行）">2. Plan-and-Execute（规划 + 执行）</h3>
+<p><strong>核心思想</strong>：先规划，再执行</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs markdown">用户: 帮我写一篇关于 AI Agent 的技术博客<br><br>Plan:<br><span class="hljs-bullet">1.</span> 研究 AI Agent 最新技术<br><span class="hljs-bullet">2.</span> 整理核心概念和架构<br><span class="hljs-bullet">3.</span> 编写博客大纲<br><span class="hljs-bullet">4.</span> 撰写详细内容<br><span class="hljs-bullet">5.</span> 审核和优化<br><br>Execute: 按计划逐步执行<br></code></pre></td></tr></table></figure>
+<p><strong>适用场景</strong>：复杂任务、多步骤操作、需要规划的场景</p>
+<p><strong>学习价值</strong>：⭐⭐⭐⭐⭐（必须掌握）</p>
+<hr>
+<h3 id="3-Multi-Agent（多-Agent-协作）">3. Multi-Agent（多 Agent 协作）</h3>
+<p><strong>核心思想</strong>：多个 Agent 分工协作</p>
+<figure class="highlight nestedtext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs nestedtext"><span class="hljs-attribute">用户</span><span class="hljs-punctuation">:</span> <span class="hljs-string">开发一个电商网站</span><br><br><span class="hljs-attribute">Product Manager</span><span class="hljs-punctuation">:</span> <span class="hljs-string">分析需求，定义功能</span><br><span class="hljs-attribute">Architect</span><span class="hljs-punctuation">:</span> <span class="hljs-string">设计系统架构</span><br><span class="hljs-attribute">Developer</span><span class="hljs-punctuation">:</span> <span class="hljs-string">编写代码</span><br><span class="hljs-attribute">Tester</span><span class="hljs-punctuation">:</span> <span class="hljs-string">测试验证</span><br></code></pre></td></tr></table></figure>
+<p><strong>适用场景</strong>：大型项目、需要多角色协作、复杂系统</p>
+<p><strong>学习价值</strong>：⭐⭐⭐⭐（进阶必学）</p>
+<hr>
+<h3 id="4-Reflection（反思-自我改进）">4. Reflection（反思 + 自我改进）</h3>
+<p><strong>核心思想</strong>：Agent 审查自己的输出，持续改进</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs makefile"><span class="hljs-section">用户: 写一个排序算法</span><br><br><span class="hljs-section">Agent: [生成代码]</span><br><span class="hljs-section">Reflection: 检查代码是否有 bug、性能问题</span><br><span class="hljs-section">Agent: [优化代码]</span><br><span class="hljs-section">Reflection: 再次检查...</span><br><span class="hljs-section">Agent: [最终版本]</span><br></code></pre></td></tr></table></figure>
+<p><strong>适用场景</strong>：代码生成、写作、需要高质量输出的场景</p>
+<p><strong>学习价值</strong>：⭐⭐⭐⭐（进阶必学）</p>
+<hr>
+<h2 id="三、精选开源项目（优中选优）">三、精选开源项目（优中选优）</h2>
+<h3 id="第一梯队：必学项目">第一梯队：必学项目</h3>
+<h4 id="1-LangChain（框架设计）">1. LangChain（框架设计）</h4>
 <ul>
-<li>深度学习的基础架构。</li>
-<li>实习过程中遇到的算法实操问题。</li>
-<li>行业前沿论文的阅读笔记。</li>
+<li><strong>GitHub</strong>: <a target="_blank" rel="noopener" href="https://github.com/langchain-ai/langchain">langchain-ai/langchain</a></li>
+<li><strong>Stars</strong>: 100k+</li>
+<li><strong>核心价值</strong>：Agent 框架设计的教科书</li>
+<li><strong>学习重点</strong>：
+<ul>
+<li>AgentExecutor 的执行流程</li>
+<li>工具调用的解析和执行</li>
+<li>记忆的存储和检索</li>
+<li>提示词模板的设计</li>
 </ul>
-<h3 id="3-数学知识与证明">3. 数学知识与证明</h3>
-<p>回归我的专业本源，我会坚持对核心数学原理进行详尽的推导。这既是对自己学术基本功的打磨，也是为了提供最严谨的内容。</p>
+</li>
+<li><strong>源码路径</strong>：<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs awk">langchain<span class="hljs-regexp">/agents/</span>      <span class="hljs-comment"># Agent 核心</span><br>langchain<span class="hljs-regexp">/chains/</span>      <span class="hljs-comment"># 链式调用</span><br>langchain<span class="hljs-regexp">/memory/</span>      <span class="hljs-comment"># 记忆实现</span><br>langchain<span class="hljs-regexp">/tools/</span>       <span class="hljs-comment"># 工具定义</span><br></code></pre></td></tr></table></figure>
+</li>
+</ul>
+<h4 id="2-LangGraph（状态机编排）">2. LangGraph（状态机编排）</h4>
+<ul>
+<li><strong>GitHub</strong>: <a target="_blank" rel="noopener" href="https://github.com/langchain-ai/langgraph">langchain-ai/langgraph</a></li>
+<li><strong>Stars</strong>: 33k+</li>
+<li><strong>核心价值</strong>：状态机和图编排的权威实现</li>
+<li><strong>学习重点</strong>：
+<ul>
+<li>StateGraph 的状态管理</li>
+<li>节点和边的定义</li>
+<li>条件路由的实现</li>
+<li>检查点和恢复机制</li>
+</ul>
+</li>
+<li><strong>源码路径</strong>：<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs pgsql">langgraph/graph/       # 图定义<br>langgraph/prebuilt/    # 预构建组件<br>langgraph/<span class="hljs-keyword">checkpoint</span>/  # 状态持久化<br></code></pre></td></tr></table></figure>
+</li>
+</ul>
+<h4 id="3-CrewAI（多-Agent-协作）">3. CrewAI（多 Agent 协作）</h4>
+<ul>
+<li><strong>GitHub</strong>: <a target="_blank" rel="noopener" href="https://github.com/crewAIInc/crewAI">crewAIInc/crewAI</a></li>
+<li><strong>Stars</strong>: 25k+</li>
+<li><strong>核心价值</strong>：角色扮演和多 Agent 协作的典范</li>
+<li><strong>学习重点</strong>：
+<ul>
+<li>Agent 角色定义</li>
+<li>任务委派机制</li>
+<li>流程管理（顺序/层级）</li>
+<li>工具集成</li>
+</ul>
+</li>
+<li><strong>源码路径</strong>：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash">crewai/agent.py        <span class="hljs-comment"># Agent 定义</span><br>crewai/task.py         <span class="hljs-comment"># 任务定义</span><br>crewai/crew.py         <span class="hljs-comment"># 团队协作</span><br>crewai/process.py      <span class="hljs-comment"># 流程管理</span><br></code></pre></td></tr></table></figure>
+</li>
+</ul>
+<hr>
+<h3 id="第二梯队：进阶项目">第二梯队：进阶项目</h3>
+<h4 id="4-AutoGen（多-Agent-对话）">4. AutoGen（多 Agent 对话）</h4>
+<ul>
+<li><strong>GitHub</strong>: <a target="_blank" rel="noopener" href="https://github.com/microsoft/autogen">microsoft/autogen</a></li>
+<li><strong>Stars</strong>: 40k+</li>
+<li><strong>核心价值</strong>：多 Agent 对话框架的标杆</li>
+<li><strong>学习重点</strong>：
+<ul>
+<li>Agent 类型（AssistantAgent、UserProxyAgent）</li>
+<li>群聊管理</li>
+<li>代码执行</li>
+<li>人类在环</li>
+</ul>
+</li>
+</ul>
+<h4 id="5-MetaGPT（元编程）">5. MetaGPT（元编程）</h4>
+<ul>
+<li><strong>GitHub</strong>: <a target="_blank" rel="noopener" href="https://github.com/geekan/MetaGPT">geekan/MetaGPT</a></li>
+<li><strong>Stars</strong>: 50k+</li>
+<li><strong>核心价值</strong>：软件开发 Multi-Agent 系统</li>
+<li><strong>学习重点</strong>：
+<ul>
+<li>标准化操作流程（SOP）</li>
+<li>角色分工</li>
+<li>文档驱动开发</li>
+</ul>
+</li>
+</ul>
+<h4 id="6-ChatDev（对话式开发）">6. ChatDev（对话式开发）</h4>
+<ul>
+<li><strong>GitHub</strong>: <a target="_blank" rel="noopener" href="https://github.com/OpenBMB/ChatDev">OpenBMB/ChatDev</a></li>
+<li><strong>Stars</strong>: 25k+</li>
+<li><strong>核心价值</strong>：对话式软件开发</li>
+<li><strong>学习重点</strong>：
+<ul>
+<li>对话式协作</li>
+<li>阶段划分</li>
+<li>质量控制</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="四、必读论文（按优先级）">四、必读论文（按优先级）</h2>
+<h3 id="第一梯队：核心理论">第一梯队：核心理论</h3>
+<ol>
+<li>
+<p><strong>ReAct: Synergizing Reasoning and Acting in Language Models</strong></p>
+<ul>
+<li>arXiv: <a target="_blank" rel="noopener" href="https://arxiv.org/abs/2210.03629">2210.03629</a></li>
+<li>核心：Agent 的基础范式</li>
+<li>必须：精读，理解 Thought-Action-Observation 循环</li>
+</ul>
+</li>
+<li>
+<p><strong>Generative Agents: Interactive Simulacra of Human Behavior</strong></p>
+<ul>
+<li>arXiv: <a target="_blank" rel="noopener" href="https://arxiv.org/abs/2304.03442">2304.03442</a></li>
+<li>核心：记忆架构（短期/长期/反思）</li>
+<li>必须：精读，理解记忆系统设计</li>
+</ul>
+</li>
+<li>
+<p><strong>MemGPT: Towards LLMs as Operating Systems</strong></p>
+<ul>
+<li>arXiv: <a target="_blank" rel="noopener" href="https://arxiv.org/abs/2310.08560">2310.08560</a></li>
+<li>核心：虚拟内存管理</li>
+<li>必须：精读，理解内存管理原理</li>
+</ul>
+</li>
+</ol>
+<h3 id="第二梯队：架构与规划">第二梯队：架构与规划</h3>
+<ol start="4">
+<li>
+<p><strong>Tree of Thoughts: Deliberate Problem Solving with Large Language Models</strong></p>
+<ul>
+<li>arXiv: <a target="_blank" rel="noopener" href="https://arxiv.org/abs/2305.10601">2305.10601</a></li>
+<li>核心：树搜索规划</li>
+</ul>
+</li>
+<li>
+<p><strong>Chain-of-Thought Prompting Elicits Reasoning in Large Language Models</strong></p>
+<ul>
+<li>arXiv: <a target="_blank" rel="noopener" href="https://arxiv.org/abs/2201.11903">2201.11903</a></li>
+<li>核心：推理链</li>
+</ul>
+</li>
+</ol>
+<h3 id="第三梯队：多-Agent-系统">第三梯队：多 Agent 系统</h3>
+<ol start="6">
+<li>
+<p><strong>ChatDev: Communicative Agents for Software Development</strong></p>
+<ul>
+<li>arXiv: <a target="_blank" rel="noopener" href="https://arxiv.org/abs/2307.07924">2307.07924</a></li>
+</ul>
+</li>
+<li>
+<p><strong>MetaGPT: Meta Programming for A Multi-Agent Collaborative Framework</strong></p>
+<ul>
+<li>arXiv: <a target="_blank" rel="noopener" href="https://arxiv.org/abs/2308.00352">2308.00352</a></li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="五、8-周学习路径">五、8 周学习路径</h2>
+<h3 id="第-1-2-周：理论基础">第 1-2 周：理论基础</h3>
+<p><strong>目标</strong>：理解 Agent 的核心概念和工作原理</p>
+<p><strong>任务</strong>：</p>
+<ol>
+<li>精读 ReAct 论文，理解 Thought-Action-Observation 循环</li>
+<li>精读 Generative Agents，理解记忆架构</li>
+<li>精读 MemGPT，理解内存管理</li>
+<li>实现一个简单的 ReAct Agent</li>
+</ol>
+<p><strong>产出</strong>：</p>
+<ul>
+<li>论文笔记</li>
+<li>简单的 ReAct Agent 代码</li>
+</ul>
+<hr>
+<h3 id="第-3-4-周：框架学习">第 3-4 周：框架学习</h3>
+<p><strong>目标</strong>：掌握主流 Agent 框架的设计</p>
+<p><strong>任务</strong>：</p>
+<ol>
+<li>学习 LangChain 源码，理解框架设计</li>
+<li>学习 LangGraph 源码，理解状态机编排</li>
+<li>实现一个带记忆的 Agent</li>
+</ol>
+<p><strong>产出</strong>：</p>
+<ul>
+<li>LangChain 源码分析笔记</li>
+<li>带记忆的 Agent 代码</li>
+</ul>
+<hr>
+<h3 id="第-5-6-周：多-Agent-系统">第 5-6 周：多 Agent 系统</h3>
+<p><strong>目标</strong>：理解多 Agent 协作机制</p>
+<p><strong>任务</strong>：</p>
+<ol>
+<li>学习 CrewAI 源码，理解角色协作</li>
+<li>学习 AutoGen 源码，理解对话管理</li>
+<li>实现一个多 Agent 协作系统</li>
+</ol>
+<p><strong>产出</strong>：</p>
+<ul>
+<li>CrewAI 源码分析笔记</li>
+<li>多 Agent 系统代码</li>
+</ul>
+<hr>
+<h3 id="第-7-8-周：综合实践">第 7-8 周：综合实践</h3>
+<p><strong>目标</strong>：构建完整的 Agent 系统</p>
+<p><strong>任务</strong>：</p>
+<ol>
+<li>设计并实现一个完整的 Agent 应用</li>
+<li>性能优化和评估</li>
+<li>撰写技术博客</li>
+<li>开源贡献</li>
+</ol>
+<p><strong>产出</strong>：</p>
+<ul>
+<li>完整的 Agent 应用</li>
+<li>技术博客</li>
+<li>开源贡献</li>
+</ul>
+<hr>
+<h2 id="六、数学原理">六、数学原理</h2>
+<h3 id="1-Agent-策略的形式化定义">1. Agent 策略的形式化定义</h3>
+<p><strong>马尔可夫决策过程 (MDP)</strong>：</p>
+<ul>
+<li>状态空间 S</li>
+<li>动作空间 A</li>
+<li>转移函数 T(s’|s,a)</li>
+<li>奖励函数 R(s,a)</li>
+<li>折扣因子 γ</li>
+</ul>
+<p><strong>Agent 策略</strong>：<br>
+π(a|s) = P(A_t = a | S_t = s)</p>
+<p><strong>价值函数</strong>：<br>
+V^π(s) = E[Σ_{t=0}^∞ γ^t R(S_t, A_t) | S_0 = s, π]</p>
+<h3 id="2-记忆检索的相似度计算">2. 记忆检索的相似度计算</h3>
+<p><strong>余弦相似度</strong>：<br>
+sim(u, v) = (u · v) / (||u|| × ||v||)</p>
+<p><strong>重要性评分</strong>：<br>
+importance(m) = α × recency(m) + β × relevance(m) + γ × frequency(m)</p>
+<p>其中：</p>
+<ul>
+<li>recency(m) = e^(-λt) （时间衰减）</li>
+<li>relevance(m) = sim(query, m) （相关性）</li>
+<li>frequency(m) = count(m) / total （频率）</li>
+</ul>
+<h3 id="3-规划的搜索算法">3. 规划的搜索算法</h3>
+<p><strong>蒙特卡洛树搜索 (MCTS)</strong>：</p>
+<ol>
+<li>选择：UCB1 公式<br>
+UCB1(s) = V(s)/N(s) + c × √(ln N(parent(s)) / N(s))</li>
+<li>扩展：生成新节点</li>
+<li>模拟：随机 rollout</li>
+<li>回溯：更新价值</li>
+</ol>
+<hr>
+<h2 id="七、学习资源">七、学习资源</h2>
+<h3 id="官方教程">官方教程</h3>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/anthropics/courses">Anthropic Courses</a> - Claude API 完整教程</li>
+<li><a target="_blank" rel="noopener" href="https://docs.langchain.com">LangChain 文档</a> - 框架使用指南</li>
+<li><a target="_blank" rel="noopener" href="https://langchain-ai.github.io/langgraph">LangGraph 教程</a> - 状态机编排</li>
+</ul>
+<h3 id="开源项目">开源项目</h3>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/anthropics/claude-code">Claude Code</a> - 实际应用（插件和文档）</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/langchain-ai/langchain">LangChain</a> - 框架设计</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/langchain-ai/langgraph">LangGraph</a> - 状态机编排</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/crewAIInc/crewAI">CrewAI</a> - 多 Agent 协作</li>
+</ul>
+<h3 id="课程">课程</h3>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://www.deeplearning.ai/short-courses/">DeepLearning.AI</a> - AI 短课程</li>
+<li><a target="_blank" rel="noopener" href="https://web.stanford.edu/class/cs224w/">Stanford CS224W</a> - 图学习</li>
+</ul>
+<hr>
+<h2 id="八、立即行动">八、立即行动</h2>
+<h3 id="今天">今天</h3>
+<ol>
+<li>下载 ReAct 论文，精读并做笔记</li>
+<li>克隆 LangChain 仓库，开始阅读源码</li>
+</ol>
+<h3 id="本周">本周</h3>
+<ol>
+<li>实现一个简单的 ReAct Agent</li>
+<li>阅读 LangChain 的 Agent 模块</li>
+</ol>
+<h3 id="下周">下周</h3>
+<ol>
+<li>学习 LangGraph 的状态机设计</li>
+<li>实现一个带记忆的 Agent</li>
+</ol>
+<h3 id="第-3-周">第 3 周</h3>
+<ol>
+<li>学习 CrewAI 的多 Agent 协作</li>
+<li>实现一个多 Agent 系统</li>
+</ol>
+<h3 id="第-4-周">第 4 周</h3>
+<ol>
+<li>构建完整的 Agent 应用</li>
+<li>撰写技术博客</li>
+<li>开源贡献</li>
+</ol>
+<hr>
+<h2 id="九、总结">九、总结</h2>
+<p>Agent 的学习路径：</p>
+<ol>
+<li><strong>理论</strong>：ReAct → Generative Agents → MemGPT</li>
+<li><strong>框架</strong>：LangChain → LangGraph → CrewAI</li>
+<li><strong>实践</strong>：简单 Agent → 带记忆 Agent → 多 Agent 系统</li>
+<li><strong>进阶</strong>：源码分析 → 开源贡献 → 构建生产级系统</li>
+</ol>
+<p><strong>核心原则</strong>：</p>
+<ul>
+<li>理论先行，理解原理</li>
+<li>源码为王，深入实现</li>
+<li>实践驱动，边做边学</li>
+<li>持续迭代，不断优化</li>
+</ul>
+<hr>
+<p><em>本文持续更新，欢迎关注。</em></p>
 
                 
               </div>
@@ -423,7 +760,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/%E5%85%B6%E4%BB%96/" class="category-chain-item">其他</a>
+  <a href="/categories/AI-%E6%8A%80%E6%9C%AF/" class="category-chain-item">AI 技术</a>
   
   
 
@@ -438,11 +775,13 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/AI/" class="print-no-link">#AI</a>
+        <a href="/tags/AI-Agent/" class="print-no-link">#AI Agent</a>
       
-        <a href="/tags/%E6%8A%95%E8%B5%84/" class="print-no-link">#投资</a>
+        <a href="/tags/LLM/" class="print-no-link">#LLM</a>
       
-        <a href="/tags/%E6%95%B0%E5%AD%A6/" class="print-no-link">#数学</a>
+        <a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" class="print-no-link">#深度学习</a>
+      
+        <a href="/tags/%E5%BC%80%E6%BA%90%E9%A1%B9%E7%9B%AE/" class="print-no-link">#开源项目</a>
       
     </div>
   
@@ -454,8 +793,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>Hello World：GTilor 的投资与学术空间</div>
-      <div>https://gtilor.github.io/2026/04/03/我的第一篇博客/</div>
+      <div>AI Agent 深度学习指南：从理论到实践</div>
+      <div>https://gtilor.github.io/2026/05/30/agent-learning-guide/</div>
     </div>
     <div class="license-meta">
       
@@ -467,7 +806,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2026年4月3日</div>
+          <div>2026年5月30日</div>
         </div>
       
       
@@ -499,15 +838,15 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2026/04/03/%E7%94%B1%E6%8A%95%E8%B5%84%E5%BC%95%E8%B5%B7%E7%9A%84%E6%80%9D%E8%80%83%E2%80%94%E2%80%94%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD%E6%97%B6%E4%BB%A3%E4%B8%8B%E7%9A%84%E6%9D%B0%E6%96%87%E6%96%AF%E6%82%96%E8%AE%BA/" title="由投资引起的思考——人工智能时代下的杰文斯悖论">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">由投资引起的思考——人工智能时代下的杰文斯悖论</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
+                    
+                      <a href="/2026/05/17/nanogpt%E8%AF%A6%E8%A7%A3/" title="nanoGPT技术详解">
+                        <span class="hidden-mobile">nanoGPT技术详解</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
                     
                   </article>
                 </div>
