@@ -1,0 +1,1289 @@
+
+
+<!DOCTYPE html>
+<html lang="en" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="GTilor">
+  <meta name="keywords" content="金融、编程、数学">
+  
+    <meta name="description" content="前言 上一篇blog我们从零拆解了一个nanoGPT，但nanoGPT的每一步都藏着巨大的探究学问，这个博客将讲述如何将我们日常看到的文本转化为机器和模型能看得懂的文本。 一、编码基础：字符如何变成字节流 人类的一切文本，在计算机底层都是一个取值范围为 {0,1,…,255}\{0,1,\dots,255\}{0,1,…,255} 的整数序列。所以问题是如何把字符变成数字呢？其实可以分两步：  1">
+<meta property="og:type" content="article">
+<meta property="og:title" content="BPE技术详解：LLM的数据处理第一步">
+<meta property="og:url" content="https://gtilor.github.io/2026/05/22/BPE%E8%AF%A6%E8%A7%A3/index.html">
+<meta property="og:site_name" content="GTilor的博客空间">
+<meta property="og:description" content="前言 上一篇blog我们从零拆解了一个nanoGPT，但nanoGPT的每一步都藏着巨大的探究学问，这个博客将讲述如何将我们日常看到的文本转化为机器和模型能看得懂的文本。 一、编码基础：字符如何变成字节流 人类的一切文本，在计算机底层都是一个取值范围为 {0,1,…,255}\{0,1,\dots,255\}{0,1,…,255} 的整数序列。所以问题是如何把字符变成数字呢？其实可以分两步：  1">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-05-22T07:45:01.000Z">
+<meta property="article:modified_time" content="2026-06-21T10:09:49.506Z">
+<meta property="article:author" content="GTilor">
+<meta property="article:tag" content="AI">
+<meta property="article:tag" content="数学">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>BPE技术详解：LLM的数据处理第一步 - GTilor的博客空间</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/KaTeX/0.16.2/katex.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"gtilor.github.io","root":"/","version":"1.9.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"expand_all":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"openkounter":{"server_url":"https://open-kounter.mintimate.cn","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>GTilor&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content (desktop) -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>Home</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>Archives</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>Categories</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>CV</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/Study-Garden/" target="_self">
+                <i class="iconfont icon-book"></i>
+                <span>Study Garden</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile grid menu overlay -->
+<div id="mobile-grid-menu" class="d-lg-none">
+  <div class="mobile-grid-menu-inner">
+    <div class="container">
+      <div class="row">
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-home-fill"></i>
+                  <span>Home</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/archives/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-archive-fill"></i>
+                  <span>Archives</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/categories/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-category-fill"></i>
+                  <span>Categories</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/about/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-user-fill"></i>
+                  <span>CV</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/categories/Study-Garden/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-book"></i>
+                  <span>Study Garden</span>
+                </div>
+              </a>
+            </div>
+          
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-search-btn">
+            <a href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-search"></i>
+                <span>Search</span>
+              </div>
+            </a>
+          </div>
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-color-toggle-btn"
+               data-label-light="Light"
+               data-label-dark="Dark">
+            <a href="javascript:;" aria-label="Color Toggle">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-dark" id="mobile-color-toggle-icon"></i>
+                <span id="mobile-color-toggle-label">Dark</span>
+              </div>
+            </a>
+          </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/one.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="BPE技术详解：LLM的数据处理第一步"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-05-22 15:45" pubdate>
+          May 22, 2026 pm
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          8.2k words
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          69 mins
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">BPE技术详解：LLM的数据处理第一步</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="前言">前言</h1>
+<p>上一篇blog我们从零拆解了一个nanoGPT，但nanoGPT的每一步都藏着巨大的探究学问，这个博客将讲述如何将我们日常看到的文本转化为机器和模型能看得懂的文本。</p>
+<h1 id="一、编码基础：字符如何变成字节流">一、编码基础：字符如何变成字节流</h1>
+<p>人类的一切文本，在计算机底层都是一个取值范围为<br>
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">{</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><mn>255</mn><mo stretchy="false">}</mo></mrow><annotation encoding="application/x-tex">\{0,1,\dots,255\}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">{</span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner">…</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">255</span><span class="mclose">}</span></span></span></span> 的整数序列。所以问题是如何把字符变成数字呢？其实可以分两步：</p>
+<ul>
+<li>1.给每个字符分配一个编号，也就是对每个字符分配一个，让他们一一对应————这是 ASCII / Unicode 干的事。</li>
+<li>2.把编号变成实际的字节序列存到硬盘上————这是 UTF-8 干的事</li>
+</ul>
+<h2 id="1-1-ASCII-与-Unicode">1.1 ASCII 与 Unicode</h2>
+<h3 id="ASCII">ASCII</h3>
+<p>ASCII是最早的方案，覆盖了英文字母、数字和标点符号等等，总共128个字符，编号从0到127，这样就把每一个字符映射到了数字。128个数字用7个比特就够了，因为<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>2</mn><mn>7</mn></msup><mo>=</mo><mn>128</mn></mrow><annotation encoding="application/x-tex">2^7=128</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">7</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">128</span></span></span></span>，但是实际存储用1个字节（8bit），最高位（第 8 位）恒为 0。</p>
+<p>但是ASCII的方案缺点很明显，无法适配全世界各种各样的语言。因此又了Unicode。</p>
+<h3 id="Unicode">Unicode</h3>
+<p>Unicode的方法很简单：为人类已知的每一个符号分配一个唯一的整数编号，码点空间：<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>U</mi><mo>=</mo><mo stretchy="false">{</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><mn>1114111</mn><mo stretchy="false">}</mo></mrow><annotation encoding="application/x-tex">U=\{0,1,\dots,1114111\}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">U</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">{</span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner">…</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">1114111</span><span class="mclose">}</span></span></span></span>，写成十六进制就是 <code>U+0000</code> 到 <code>U+10FFFF</code>，所以这些码点其实根本很难用完。</p>
+<p>ASCII方案其实是Unicode方案的子集，他们的前面128个码点的对应关系完全一致。</p>
+<h2 id="1-2-UTF-8：可变长编码的精巧设计">1.2 UTF-8：可变长编码的精巧设计</h2>
+<p>Unicode的最大码点来到了1,114,111，需要21bit才能存完所有的Unicode码点，那如果每个字符都需要用3个字节来存储的话，那相比ASCII来说，英文和数字简单字符的存储体积需要3倍以上的内存容量。</p>
+<p>UTF-8的设计思路:既然ASCII代表常见的字符，那我们希望常见的字符用更少的字节存储，罕见的字符用更多的字节存储。所以本质上是一种变长编码。</p>
+<p>编码规则如下表所示，<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mo stretchy="false">(</mo><mi>c</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">L(c)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">L</span><span class="mopen">(</span><span class="mord mathnormal">c</span><span class="mclose">)</span></span></span></span>为所需要的字节数：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">码点范围</th>
+<th style="text-align:center"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mo stretchy="false">(</mo><mi>C</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">L(C)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">L</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mclose">)</span></span></span></span></th>
+<th style="text-align:center">有效数据位</th>
+<th style="text-align:left">字节模板</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">[</mo><mn>0</mn><mo separator="true">,</mo><mtext>  </mtext><mn>127</mn><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">[0,\; 127]</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">127</span><span class="mclose">]</span></span></span></span></td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">7</td>
+<td style="text-align:left"><code>0xxxxxxx</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">[</mo><mn>128</mn><mo separator="true">,</mo><mtext>  </mtext><mn>2047</mn><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">[128,\; 2047]</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord">128</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">2047</span><span class="mclose">]</span></span></span></span></td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">11</td>
+<td style="text-align:left"><code>110xxxxx 10xxxxxx</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">[</mo><mn>2048</mn><mo separator="true">,</mo><mtext>  </mtext><mn>65535</mn><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">[2048,\; 65535]</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord">2048</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">65535</span><span class="mclose">]</span></span></span></span></td>
+<td style="text-align:center">3</td>
+<td style="text-align:center">16</td>
+<td style="text-align:left"><code>1110xxxx 10xxxxxx 10xxxxxx</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">[</mo><mn>65536</mn><mo separator="true">,</mo><mtext>  </mtext><mn>1114111</mn><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">[65536,\; 1114111]</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord">65536</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">1114111</span><span class="mclose">]</span></span></span></span></td>
+<td style="text-align:center">4</td>
+<td style="text-align:center">21</td>
+<td style="text-align:left"><code>11110xxx 10xxxxxx 10xxxxxx 10xxxxxx</code></td>
+</tr>
+</tbody>
+</table>
+<p>模板中的 <code>x</code> 是数据位，其余的 <code>0</code>、<code>1</code>、<code>10</code>、<code>110</code>、<code>1110</code>、<code>11110</code> 是固定前缀。假设<code>&quot;你&quot;</code> 的 Unicode 码点 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>C</mi><mo>=</mo><mn>20320</mn></mrow><annotation encoding="application/x-tex">C = 20320</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">20320</span></span></span></span>，则其码点范围为 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">[</mo><mn>2048</mn><mo separator="true">,</mo><mtext>  </mtext><mn>65535</mn><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">[2048,\; 65535]</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord">2048</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">65535</span><span class="mclose">]</span></span></span></span>，那么其二进制严格对应为 <code>0100 1111 0110 0000</code>，使用字节模版 <code>1110xxxx 10xxxxxx 10xxxxxx</code>。则将 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>C</mi></mrow><annotation encoding="application/x-tex">C</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span></span></span></span> 的二进制位从高到低填入模版到 <code>x</code> 位置，则可以得到</p>
+<figure class="highlight tap"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs tap">C 的二进制（16 位）：0100 <span class="hljs-number"> 111101 </span> 100000<br>                     ↓       ↓       ↓<br>模板：              1110xxxx 10xxxxxx 10xxxxxx<br>填入：             <span class="hljs-number"> 11100100 </span>10111101 10100000<br>十六进制：             E4       BD       A0<br>十进制：             <span class="hljs-number"> 228 </span>    <span class="hljs-number"> 189 </span>     160<br></code></pre></td></tr></table></figure>
+<p>这样就可以通过 3 个字节和 3 个十进制数字 (256内) 表示中文字符了。这种字节模版设计的巧妙之处在于，它在信息论中构成了一种 <strong>前缀码（Prefix Code）</strong>，保证了<strong>唯一可译性</strong>。</p>
+<h1 id="二、byte-level-bpe-算法：从压缩到分词">二、Byte-level BPE 算法：从压缩到分词</h1>
+<h2 id="2-1-为什么需要-BPE：char-level-的局限">2.1 为什么需要 BPE：char-level 的局限</h2>
+<p>回顾 nanoGPT 的 char-level：每个字符一个 token，词表小（~65），但序列极长，语义稀疏，Attention 的 O(N^2) 复杂度成为瓶颈。word-level 则词表爆炸且有 OOV 问题。BPE 是两者之间的折中。</p>
+<h2 id="2-2-Byte-level-BPE：基础词表从数万压缩到-256">2.2 Byte-level BPE：基础词表从数万压缩到 256</h2>
+<p>形式化定义：</p>
+<ul>
+<li>基础词表 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>V</mi><mn>0</mn></msub><mo>=</mo><mrow><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><mn>255</mn></mrow></mrow><annotation encoding="application/x-tex">V_0 = {0, 1, \dots, 255}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.2222em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner">…</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">255</span></span></span></span></span></li>
+<li>目标词表大小 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>V</mi><mi>t</mi></msub><mi>a</mi><mi>r</mi><mi>g</mi><mi>e</mi><mi>t</mi></mrow><annotation encoding="application/x-tex">V_target</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.2222em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord mathnormal">a</span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span><span class="mord mathnormal" style="margin-right:0.0359em;">g</span><span class="mord mathnormal">e</span><span class="mord mathnormal">t</span></span></span></span>，目标词表的大小。</li>
+<li>合并次数 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi><mo>=</mo><msub><mi>V</mi><mi>t</mi></msub><mi>a</mi><mi>r</mi><mi>g</mi><mi>e</mi><mi>t</mi><mo>−</mo><mn>256</mn></mrow><annotation encoding="application/x-tex">k = V_target - 256</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.2222em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord mathnormal">a</span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span><span class="mord mathnormal" style="margin-right:0.0359em;">g</span><span class="mord mathnormal">e</span><span class="mord mathnormal">t</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">256</span></span></span></span></li>
+<li>每一步：找到语料中出现频率最高的相邻 pair，合并为新 token，加入词表</li>
+<li>合并准则：<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext>argmax </mtext><mi>c</mi><mi>o</mi><mi>u</mi><mi>n</mi><mi>t</mi><mo stretchy="false">(</mo><mtext>pair</mtext><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\text{argmax } count(\text{pair})</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord text"><span class="mord">argmax </span></span><span class="mord mathnormal">co</span><span class="mord mathnormal">u</span><span class="mord mathnormal">n</span><span class="mord mathnormal">t</span><span class="mopen">(</span><span class="mord text"><span class="mord">pair</span></span><span class="mclose">)</span></span></span></span>，纯频率统计，相同数量的词保留靠前的。</li>
+</ul>
+<h2 id="2-4-Step-by-Step-手推例子">2.4 Step-by-Step 手推例子</h2>
+<p>理论讲够了，现在用一个精心设计的小例子，从头到尾手推一遍完整的 BPE 训练过程。</p>
+<h3 id="语料库">语料库</h3>
+<p>我们用下面这段极小的&quot;语料库&quot;（实际 BPE 训练用的是数十 GB 的文本，这里为了手推故意缩到最小）：</p>
+<figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs abnf"><span class="hljs-attribute">text</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;the thee the thee bee bees&quot;</span><br></code></pre></td></tr></table></figure>
+<p>6 个&quot;词&quot;，共 26 个字符（含空格）。</p>
+<h3 id="Step-0：UTF-8-编码为字节序列">Step 0：UTF-8 编码为字节序列</h3>
+<p>先将文本转为 UTF-8 字节序列。这里全是 ASCII 字符，每个字符恰好 1 个字节：</p>
+<figure class="highlight tap"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs tap">字符：  t   h   e       t   h   e   e       t   h   e       t   h   e   e       b   e   e       b   e   e   s<br>字节：<span class="hljs-number"> 116 </span>104<span class="hljs-number"> 101 </span><span class="hljs-number"> 32 </span>116<span class="hljs-number"> 104 </span>101<span class="hljs-number"> 101 </span><span class="hljs-number"> 32 </span>116<span class="hljs-number"> 104 </span>101 <span class="hljs-number"> 32 </span>116<span class="hljs-number"> 104 </span>101<span class="hljs-number"> 101 </span><span class="hljs-number"> 32 </span><span class="hljs-number"> 98 </span>101<span class="hljs-number"> 101 </span><span class="hljs-number"> 32 </span><span class="hljs-number"> 98 </span>101<span class="hljs-number"> 101 </span>115<br></code></pre></td></tr></table></figure>
+<p>共 26 个字节。初始词表 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>V</mi><mn>0</mn></msub><mo>=</mo><mo stretchy="false">{</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><mn>255</mn><mo stretchy="false">}</mo></mrow><annotation encoding="application/x-tex">V_0 = \{0, 1, \dots, 255\}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.2222em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">{</span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner">…</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">255</span><span class="mclose">}</span></span></span></span>，<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">∣</mi><msub><mi>V</mi><mn>0</mn></msub><mi mathvariant="normal">∣</mi><mo>=</mo><mn>256</mn></mrow><annotation encoding="application/x-tex">|V_0| = 256</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">∣</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.2222em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord">∣</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">256</span></span></span></span>。</p>
+<p>为了后面书写方便，给每个字节起个简称：</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs routeros"><span class="hljs-attribute">t</span>=116  <span class="hljs-attribute">h</span>=104  <span class="hljs-attribute">e</span>=101  <span class="hljs-string">&#x27; &#x27;</span>=32  <span class="hljs-attribute">b</span>=98  <span class="hljs-attribute">s</span>=115<br></code></pre></td></tr></table></figure>
+<h3 id="Step-1：统计相邻-pair-频率">Step 1：统计相邻 pair 频率</h3>
+<p>遍历整个字节序列，统计每个相邻 pair 出现的次数：</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs powershell">序列： t <span class="hljs-built_in">h</span> e <span class="hljs-string">&#x27; &#x27;</span> t <span class="hljs-built_in">h</span> e e <span class="hljs-string">&#x27; &#x27;</span> t <span class="hljs-built_in">h</span> e <span class="hljs-string">&#x27; &#x27;</span> t <span class="hljs-built_in">h</span> e e <span class="hljs-string">&#x27; &#x27;</span> b e e <span class="hljs-string">&#x27; &#x27;</span> b e e s<br>        ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑ ↑<br></code></pre></td></tr></table></figure>
+<p>逐对统计：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">Pair</th>
+<th style="text-align:center">对应字符</th>
+<th style="text-align:center">出现次数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">(e, ’ ')</td>
+<td style="text-align:center">&quot;e &quot;</td>
+<td style="text-align:center"><strong>6</strong></td>
+</tr>
+<tr>
+<td style="text-align:center">(h, e)</td>
+<td style="text-align:center">“he“</td>
+<td style="text-align:center"><strong>4</strong></td>
+</tr>
+<tr>
+<td style="text-align:center">(t, h)</td>
+<td style="text-align:center">“th“</td>
+<td style="text-align:center"><strong>4</strong></td>
+</tr>
+<tr>
+<td style="text-align:center">(’ ', t)</td>
+<td style="text-align:center">&quot; t&quot;</td>
+<td style="text-align:center">4</td>
+</tr>
+<tr>
+<td style="text-align:center">(e, e)</td>
+<td style="text-align:center">“ee“</td>
+<td style="text-align:center">3</td>
+</tr>
+<tr>
+<td style="text-align:center">(’ ', b)</td>
+<td style="text-align:center">&quot; b&quot;</td>
+<td style="text-align:center">2</td>
+</tr>
+<tr>
+<td style="text-align:center">(b, e)</td>
+<td style="text-align:center">“be“</td>
+<td style="text-align:center">2</td>
+</tr>
+<tr>
+<td style="text-align:center">(e, s)</td>
+<td style="text-align:center">“es“</td>
+<td style="text-align:center">1</td>
+</tr>
+</tbody>
+</table>
+<p>最高频 pair：<strong>(e, ’ ')</strong> = <strong>(101, 32)</strong>，出现 6 次。</p>
+<h3 id="Step-1-执行合并">Step 1 执行合并</h3>
+<p>将 (101, 32) 合并为新 token，分配 ID = <strong>256</strong>：</p>
+<p class="katex-block "><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mtext>Merge 1: </mtext><mo stretchy="false">(</mo><mn>101</mn><mo separator="true">,</mo><mn>32</mn><mo stretchy="false">)</mo><mo>→</mo><mn>256</mn><mspace width="1em"/><mo stretchy="false">[</mo><mtext>&quot;e_&quot;</mtext><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">\text{Merge 1: } (101, 32) \to 256 \quad [\text{&quot;e\_&quot;}]
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord text"><span class="mord">Merge 1: </span></span><span class="mopen">(</span><span class="mord">101</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">32</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.06em;vertical-align:-0.31em;"></span><span class="mord">256</span><span class="mspace" style="margin-right:1em;"></span><span class="mopen">[</span><span class="mord text"><span class="mord">&quot;e_&quot;</span></span><span class="mclose">]</span></span></span></span></span></p>
+<p>更新序列（每个 &quot;e &quot; 都被替换为 256）：</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs stylus">原始：  t  h  e  <span class="hljs-string">&#x27; &#x27;</span>  t  h  e  e  <span class="hljs-string">&#x27; &#x27;</span>  t  h  e  <span class="hljs-string">&#x27; &#x27;</span>  t  h  e  e  <span class="hljs-string">&#x27; &#x27;</span>  <span class="hljs-selector-tag">b</span>  e  e  <span class="hljs-string">&#x27; &#x27;</span>  <span class="hljs-selector-tag">b</span>  e  e  s<br>合并后：t  h  <span class="hljs-selector-attr">[256]</span>  t  h  e  <span class="hljs-selector-attr">[256]</span>  t  h  <span class="hljs-selector-attr">[256]</span>  t  h  e  <span class="hljs-selector-attr">[256]</span>  <span class="hljs-selector-tag">b</span>  e  <span class="hljs-selector-attr">[256]</span>  <span class="hljs-selector-tag">b</span>  e  e  s<br></code></pre></td></tr></table></figure>
+<p>序列长度：26 → <strong>20</strong>（每次合并，序列中每出现一次该 pair 就缩短 1，共减少 6）。</p>
+<p>词表大小：256 → <strong>257</strong>。</p>
+<h3 id="Step-2：重新统计-pair-频率">Step 2：重新统计 pair 频率</h3>
+<p>在<strong>更新后的序列</strong>上重新统计：</p>
+<figure class="highlight tap"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs tap">序列： t h<span class="hljs-number"> 256 </span>t h e<span class="hljs-number"> 256 </span>t h<span class="hljs-number"> 256 </span>t h e<span class="hljs-number"> 256 </span>b e<span class="hljs-number"> 256 </span>b e e s<br></code></pre></td></tr></table></figure>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">Pair</th>
+<th style="text-align:center">出现次数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">(t, h)</td>
+<td style="text-align:center"><strong>4</strong></td>
+</tr>
+<tr>
+<td style="text-align:center">(h, 256)</td>
+<td style="text-align:center"><strong>4</strong></td>
+</tr>
+<tr>
+<td style="text-align:center">(h, e)</td>
+<td style="text-align:center">2</td>
+</tr>
+<tr>
+<td style="text-align:center">(256, t)</td>
+<td style="text-align:center">3</td>
+</tr>
+<tr>
+<td style="text-align:center">(e, 256)</td>
+<td style="text-align:center">2</td>
+</tr>
+<tr>
+<td style="text-align:center">(b, e)</td>
+<td style="text-align:center">2</td>
+</tr>
+<tr>
+<td style="text-align:center">(256, b)</td>
+<td style="text-align:center">2</td>
+</tr>
+<tr>
+<td style="text-align:center">(e, e)</td>
+<td style="text-align:center">1</td>
+</tr>
+<tr>
+<td style="text-align:center">(e, s)</td>
+<td style="text-align:center">1</td>
+</tr>
+</tbody>
+</table>
+<p>出现了一个新的高频 pair：<strong>(h, 256)</strong>，这是 Step 1 合并的&quot;副产品&quot;——原来 &quot;he &quot; 三个字节中，&quot;e &quot; 被合并成了 256，剩下的 h 就和 256 紧邻了。</p>
+<p><strong>(t, h)</strong> 和 <strong>(h, 256)</strong> 并列最高，都是 4 次。按照&quot;相同数量保留靠前的&quot;规则（即 ID 较小的优先），选 <strong>(t, h)</strong> = <strong>(116, 104)</strong>。</p>
+<h3 id="Step-2-执行合并">Step 2 执行合并</h3>
+<p class="katex-block "><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mtext>Merge 2: </mtext><mo stretchy="false">(</mo><mn>116</mn><mo separator="true">,</mo><mn>104</mn><mo stretchy="false">)</mo><mo>→</mo><mn>257</mn><mspace width="1em"/><mo stretchy="false">[</mo><mtext>&quot;th&quot;</mtext><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">\text{Merge 2: } (116, 104) \to 257 \quad [\text{&quot;th&quot;}]
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord text"><span class="mord">Merge 2: </span></span><span class="mopen">(</span><span class="mord">116</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">104</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">257</span><span class="mspace" style="margin-right:1em;"></span><span class="mopen">[</span><span class="mord text"><span class="mord">&quot;th&quot;</span></span><span class="mclose">]</span></span></span></span></span></p>
+<p>更新序列：</p>
+<figure class="highlight tap"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs tap">原始：  t h<span class="hljs-number"> 256 </span> t h e<span class="hljs-number"> 256 </span> t h<span class="hljs-number"> 256 </span> t h e<span class="hljs-number"> 256 </span> b e<span class="hljs-number"> 256 </span> b e e s<br>合并后：[257]<span class="hljs-number"> 256 </span> [257] e<span class="hljs-number"> 256 </span> [257]<span class="hljs-number"> 256 </span> [257] e<span class="hljs-number"> 256 </span> b e<span class="hljs-number"> 256 </span> b e e s<br></code></pre></td></tr></table></figure>
+<p>序列长度：20 → <strong>16</strong>（减少 4）。词表大小：257 → <strong>258</strong>。</p>
+<h3 id="Step-3：再次统计">Step 3：再次统计</h3>
+<figure class="highlight tap"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs tap">序列：<span class="hljs-number"> 257 </span>256 <span class="hljs-number"> 257 </span>e<span class="hljs-number"> 256 </span><span class="hljs-number"> 257 </span>256 <span class="hljs-number"> 257 </span>e<span class="hljs-number"> 256 </span> b e<span class="hljs-number"> 256 </span> b e e s<br></code></pre></td></tr></table></figure>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">Pair</th>
+<th style="text-align:center">出现次数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><strong>(257, 256)</strong></td>
+<td style="text-align:center"><strong>3</strong></td>
+</tr>
+<tr>
+<td style="text-align:center">(257, e)</td>
+<td style="text-align:center">2</td>
+</tr>
+<tr>
+<td style="text-align:center">(e, 256)</td>
+<td style="text-align:center">2</td>
+</tr>
+<tr>
+<td style="text-align:center">(b, e)</td>
+<td style="text-align:center">2</td>
+</tr>
+<tr>
+<td style="text-align:center">(256, b)</td>
+<td style="text-align:center">1</td>
+</tr>
+<tr>
+<td style="text-align:center">(b, e)</td>
+<td style="text-align:center">2</td>
+</tr>
+<tr>
+<td style="text-align:center">(e, e)</td>
+<td style="text-align:center">1</td>
+</tr>
+<tr>
+<td style="text-align:center">(e, s)</td>
+<td style="text-align:center">1</td>
+</tr>
+</tbody>
+</table>
+<p>最高频：<strong>(257, 256)</strong> = 3 次。这对应的是原始文本中 &quot;the &quot; 的整体——“th“ (257) 后面紧跟 &quot;e &quot; (256)。</p>
+<h3 id="Step-3-执行合并">Step 3 执行合并</h3>
+<p class="katex-block "><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mtext>Merge 3: </mtext><mo stretchy="false">(</mo><mn>257</mn><mo separator="true">,</mo><mn>256</mn><mo stretchy="false">)</mo><mo>→</mo><mn>258</mn><mspace width="1em"/><mo stretchy="false">[</mo><mtext>&quot;the_&quot;</mtext><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">\text{Merge 3: } (257, 256) \to 258 \quad [\text{&quot;the\_&quot;}]
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord text"><span class="mord">Merge 3: </span></span><span class="mopen">(</span><span class="mord">257</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">256</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.06em;vertical-align:-0.31em;"></span><span class="mord">258</span><span class="mspace" style="margin-right:1em;"></span><span class="mopen">[</span><span class="mord text"><span class="mord">&quot;the_&quot;</span></span><span class="mclose">]</span></span></span></span></span></p>
+<p>更新序列：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs css">合并前： <span class="hljs-number">257</span> <span class="hljs-number">256</span>  <span class="hljs-number">257</span> e <span class="hljs-number">256</span>  <span class="hljs-number">257</span> <span class="hljs-number">256</span>  <span class="hljs-number">257</span> e <span class="hljs-number">256</span>  <span class="hljs-selector-tag">b</span> e <span class="hljs-number">256</span>  <span class="hljs-selector-tag">b</span> e e s<br>合并后： <span class="hljs-selector-attr">[258]</span>   <span class="hljs-selector-attr">[257]</span> e <span class="hljs-selector-attr">[256]</span>  <span class="hljs-selector-attr">[258]</span>   <span class="hljs-selector-attr">[257]</span> e <span class="hljs-selector-attr">[256]</span>  <span class="hljs-selector-tag">b</span> e <span class="hljs-selector-attr">[256]</span>  <span class="hljs-selector-tag">b</span> e e s<br></code></pre></td></tr></table></figure>
+<p>序列长度：16 → <strong>13</strong>。词表大小：258 → <strong>259</strong>。</p>
+<h3 id="此时的词表">此时的词表</h3>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">ID</span> <span class="hljs-number">0</span>~<span class="hljs-number">255</span> : 原始字节（<span class="hljs-number">0</span>, <span class="hljs-number">1</span>, ..., <span class="hljs-number">255</span>）<br><span class="hljs-attribute">ID</span> <span class="hljs-number">256</span>   : <span class="hljs-string">&quot;e &quot;</span>   (e + 空格)<br><span class="hljs-attribute">ID</span> <span class="hljs-number">257</span>   : <span class="hljs-string">&quot;th&quot;</span>   (t + h)<br><span class="hljs-attribute">ID</span> <span class="hljs-number">258</span>   : <span class="hljs-string">&quot;the &quot;</span> (th + e空格)   ← 由 ID <span class="hljs-number">257</span> + ID <span class="hljs-number">256</span> 合并而来<br></code></pre></td></tr></table></figure>
+<p>注意 <strong>258 号 token 不是直接从字节合并来的，而是由两个已有 token 再次合并产生的</strong>。这就是 BPE 的递归特性：每次合并都在前一次的基础上构建更大的 token，像叠积木一样。</p>
+<h3 id="后续合并的规律">后续合并的规律</h3>
+<p>如果继续做下去，BPE 会逐渐发现：</p>
+<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs livecodeserver"><span class="hljs-string">&quot;bee&quot;</span> 的字节 (<span class="hljs-number">98</span>, <span class="hljs-number">101</span>, <span class="hljs-number">101</span>) → 先合并 (e, e) → 再合并 (b, ee) → 得到 <span class="hljs-string">&quot;bee&quot;</span> <span class="hljs-keyword">token</span><br><span class="hljs-string">&quot;bees&quot;</span> 中的 <span class="hljs-string">&quot;bee&quot;</span> + <span class="hljs-string">&quot;s&quot;</span> → 如果频率够高也会合并<br></code></pre></td></tr></table></figure>
+<p>最终，高频词 &quot;the &quot; 可能被编码为 1 个 token，“bee“ 被编码为 1 个 token，而从未在训练集中出现过的新词（比如 “flee“）则回退到字节级编码：<code>[102, 108, 101, 101]</code>——这就是 Byte-Level BPE 的 OOV 免疫能力。</p>
+<h3 id="手推的收获">手推的收获</h3>
+<p>通过这个例子，我们亲眼看到了三个关键现象：</p>
+<ol>
+<li>
+<p><strong>BPE 是纯频率驱动的</strong>：它不知道 “the“ 是英语单词，不知道空格是词边界，它只看到 “101, 32“ 这个 pair 出现了 6 次，所以先合并它。</p>
+</li>
+<li>
+<p><strong>合并是递归的</strong>：Step 1 合并出 256 (&quot;e &quot;)，Step 3 才用 256 和 257 (“th“) 合并出 258 (&quot;the &quot;)。每次合并都在前一步的产物上继续构建。</p>
+</li>
+<li>
+<p><strong>新 pair 在合并中涌现</strong>：Step 1 之前，(h, 256) 这个 pair 不存在。合并 (e, ’ ') 之后，h 后面紧跟 256，这个新 pair 就&quot;涌现&quot;出来了。BPE 必须在每一步重新统计频率，因为序列结构在不断变化。</p>
+</li>
+</ol>
+<h1 id="三、bpe-的数学证明与信息论视角">三、BPE 的数学证明与信息论视角</h1>
+<h2 id="3-1-BPE-的本质：贪心无损压缩">3.1 BPE 的本质：贪心无损压缩</h2>
+<p>BPE 的每一步合并都在缩短序列长度，本质上就是在做贪心压缩。和 Huffman 编码的区别：Huffman 是最优前缀码，BPE 不保证最优，但 BPE 产出的是可学习的 token 序列而非比特流。</p>
+<h2 id="3-2-BPE-vs-WordPiece-vs-Unigram：三种-Subword-算法辨析">3.2 BPE vs WordPiece vs Unigram：三种 Subword 算法辨析</h2>
+<table>
+<thead>
+<tr>
+<th>算法</th>
+<th>合并/分割方向</th>
+<th>合并准则</th>
+<th>代表模型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BPE</td>
+<td>自底向上合并</td>
+<td>argmax count(pair)，纯频率</td>
+<td>GPT-2/3/4, LLaMA</td>
+</tr>
+<tr>
+<td>WordPiece</td>
+<td>自底向上合并</td>
+<td>近似最大化训练数据似然（≈PMI）</td>
+<td>BERT</td>
+</tr>
+<tr>
+<td>Unigram</td>
+<td>自顶向下裁剪</td>
+<td>最小化移除后的语言模型损失</td>
+<td>SentencePiece, T5</td>
+</tr>
+</tbody>
+</table>
+<p>关键区分：BPE 用的是频率，WordPiece 用的才是类 PMI 准则，Unigram 是概率模型。三者不可混淆。</p>
+<h2 id="3-3-多语言场景下的-BPE-偏置：以中文为例">3.3 多语言场景下的 BPE 偏置：以中文为例</h2>
+<!--
+核心问题：中文每个汉字的 UTF-8 编码占 3 个字节。在 byte-level BPE 中，一个汉字至少需要经过多次合并才能成为一个完整 token。
+
+具体演示："你好" 的 UTF-8 字节拆解：
+- "你" = 0xE4 0xBD 0xA0 (3 bytes)
+- "好" = 0xE5 0xA5 0xBD (3 bytes)
+
+对比英文 "hi" = 0x68 0x69 (2 bytes)
+
+这导致：同等语义内容，中文的 token 数远多于英文，消耗更多 context window。
+这正是 DeepSeek 等中文模型扩展词表的核心动机。
+
+可以用 tiktoken 实际编码几段中英文，对比 token 数量。
+
+★ 待补充的洞察：
+字节级 BPE 的初始词表里，228 这个 token 没有任何语义。英文字符如 "h","e","l" 在语料里极高频，1-2 次合并就变成有语义的 token。
+但中文的字节序列（如 228,189,160）在英文主导的语料里合并慢，导致模型初期看到的中文是无语义的字节碎片。
+同样的上下文窗口，英文能装 ~3000 个词的语义，中文可能只能装 ~1000 个字——中文模型的"有效上下文"被压缩了。
+这揭示了深层问题：tokenizer 的偏见会传导到模型能力上，不是模型不够聪明，而是它"看到"的中文表示本身就是低效的。
+DeepSeek 的大词表（10万+）正是为了缓解这个问题。
+-->
+<h1 id="四、代码实现：手写一个-bpe-tokenizer（minbpe）">四、代码实现：手写一个 BPE Tokenizer（minbpe）</h1>
+<h2 id="4-1-BasicTokenizer：从零实现核心合并循环">4.1 BasicTokenizer：从零实现核心合并循环</h2>
+<!-- 剖析 Karpathy 的 minbpe 中 BasicTokenizer 的实现。映射回第二章的数学定义，逐函数解释：get_stats(), merge(), train(), encode(), decode()。 -->
+<h2 id="4-2-RegexTokenizer：GPT-4-级别的预分词与特殊-Token">4.2 RegexTokenizer：GPT-4 级别的预分词与特殊 Token</h2>
+<!-- 在 BasicTokenizer 基础上加入：正则预分词（映射回 2.3 节的 Pre-tokenization）、特殊控制 token（<endoftext> 等）的注册与处理。 -->
+<h2 id="4-3-完整演示：train-encode-decode">4.3 完整演示：train / encode / decode</h2>
+<!-- 用一段实际文本跑通完整流程，展示训练过程中词表的增长、编码前后的对比、解码还原的正确性验证。 -->
+<h1 id="五、工业级-tokenizer-实现对比">五、工业级 Tokenizer 实现对比</h1>
+<h2 id="5-1-Tiktoken（GPT-2-4）：Rust-加速与正则工程">5.1 Tiktoken（GPT-2/4）：Rust 加速与正则工程</h2>
+<!-- OpenAI 的工业级实现。核心卖点：Rust 编写的极致性能、复杂的正则预分词策略、BPE 合并表的高效查找。 -->
+<h2 id="5-2-SentencePiece（LLaMA）：语言无关的-Unigram-设计">5.2 SentencePiece（LLaMA）：语言无关的 Unigram 设计</h2>
+<!-- Google 的方案。核心区别：不依赖预分词，直接在原始字符串上训练；底层默认用 Unigram 模型而非 BPE（虽然也支持 BPE 模式）。 -->
+<h2 id="5-3-DeepSeek：多语言词表优化的工程实践">5.3 DeepSeek：多语言词表优化的工程实践</h2>
+<!-- 如何通过扩展词表、调整中文 token 比例来提升中文的压缩率和推理效率。映射回 3.4 节的分析。 -->
+<h2 id="5-4-无-Tokenizer-路线：ByT5、MambaByte-与未来">5.4 无 Tokenizer 路线：ByT5、MambaByte 与未来</h2>
+<!-- 极端路线：完全不做 tokenization，直接在字节级别建模。优势：彻底消除 tokenization 的信息损失。劣势：序列极长，计算成本高。MambaByte 用线性复杂度的 SSM 架构部分缓解了这个问题。 -->
+<h1 id="六、分词的前沿思考">六、分词的前沿思考</h1>
+<p>虽然 Scaling Law 使得模型在参数量和训练数据规模的暴力增长中能够克服诸多底层表征的瑕疵，但分词器（Tokenizer）的设计依旧是多语言处理、工程效率以及精密推理的核心瓶颈。从信息论与学术实证的角度来看，传统的 BPE 分词在以下三个关键维度正面临严峻挑战。</p>
+<h2 id="6-1-中文与多语言：UTF-8-编码导致的分词偏置">6.1 中文与多语言：UTF-8 编码导致的分词偏置</h2>
+<h3 id="1-学术实证与瓶颈">1. 学术实证与瓶颈</h3>
+<p>在多语言场景下，BPE 最致命的缺陷在于跨语言的信息密度失衡。</p>
+<ul>
+<li><strong>文献支撑</strong>：<a target="_blank" rel="noopener" href="https://arxiv.org/abs/2310.08754">Petrov et al. (2023)</a> 在论文 <em>Is tokenizer bias a bottleneck for multilingual LLMs?</em> 中定量分析了这一偏置。由于 UTF-8 的物理编码结构，绝大多数中文字符需要占用 3 个字节。在英文主导的预训练语料中，这些字节很难在 BPE 的贪心频次统计中获得足够的合并优先级。</li>
+<li><strong>后果</strong>：这导致同等语义内容下，中文消耗的 token 数量是英文的 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><mo>∼</mo><mn>3.5</mn></mrow><annotation encoding="application/x-tex">2 \sim 3.5</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∼</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">3.5</span></span></span></span> 倍。由于 Transformer 的 Self-Attention 具有 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="script">O</mi><mo stretchy="false">(</mo><msup><mi>N</mi><mn>2</mn></msup><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\mathcal{O}(N^2)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord mathcal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span> 的复杂度，这意味着中文用户在计算开销和推理延迟上承担了数倍的&quot;隐形税&quot;，且模型的有效上下文窗口（Context Window）物理缩水了 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>60</mn><mi mathvariant="normal">%</mi></mrow><annotation encoding="application/x-tex">60\%</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8056em;vertical-align:-0.0556em;"></span><span class="mord">60%</span></span></span></span> 以上。</li>
+</ul>
+<h3 id="2-工业界改进方案">2. 工业界改进方案</h3>
+<ul>
+<li><strong>词表扩展（Vocabulary Expansion）与重平衡</strong>：以 <a target="_blank" rel="noopener" href="https://arxiv.org/abs/2309.16609">Qwen Technical Report (2023)</a> 为代表，现代多语言模型将词表大小由早期 LLaMA 的 32K 直接扩增至 100K 甚至 150K 级别。在 BPE 训练阶段大幅拉高中文语料配比，使得高频汉字及常用词组能一步合并为单一 token，中文单字的平均 token 消耗得以缩减至 ~0.6。</li>
+</ul>
+<hr>
+<h2 id="6-2-代码：语法树（AST）割裂与格式冗余">6.2 代码：语法树（AST）割裂与格式冗余</h2>
+<h3 id="1-学术实证与瓶颈-2">1. 学术实证与瓶颈</h3>
+<p>代码文本具有强结构性与高局部重复性，而通用 BPE 分词器无法感知抽象语法树（AST）的物理边界。</p>
+<ul>
+<li><strong>文献支撑</strong>：<a target="_blank" rel="noopener" href="https://arxiv.org/abs/2305.06161">Li et al. (2023)</a> 在 StarCoder 论文中指出，普通分词器对连续空格（缩进）以及代码关键字与变量的粘连处理极低效。</li>
+<li><strong>后果</strong>：代码前的大量缩进空格会按长度任意切分（或以单个空格 token 堆叠），造成大量无意义的 token 占用。此外，组合标识符（如 <code>calculateLoss</code>）在词表中被切碎，且在表征空间中与其变体（如 <code>calculate_loss</code>）物理隔离，模型必须在深层重新学习这些在句法上完全等价的结构。</li>
+</ul>
+<h3 id="2-工业界改进方案-2">2. 工业界改进方案</h3>
+<ul>
+<li><strong>缩进专用 Token（Indentation-aware Tokens）</strong>：强行在词表中预置专属的缩进 token（例如 <code>&lt;|space_4|&gt;</code>、<code>&lt;|space_8|&gt;</code> 等），将缩进的 token 消耗从 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="script">O</mi><mo stretchy="false">(</mo><mi>L</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\mathcal{O}(L)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathcal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">L</span><span class="mclose">)</span></span></span></span> 降低为 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="script">O</mi><mo stretchy="false">(</mo><mn>1</mn><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\mathcal{O}(1)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathcal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span></span></span></span>。</li>
+<li><strong>词法分词限制（Lexer-based Rules）</strong>：利用正则或词法分析器，在预分词阶段禁止跨单词/符号边界进行贪心合并，保证 <code>def</code>、<code>return</code>、操作符（如 <code>+=</code>）的结构独立性。</li>
+</ul>
+<hr>
+<h2 id="6-3-推理与数学：数值非连续表征与形态学盲区">6.3 推理与数学：数值非连续表征与形态学盲区</h2>
+<h3 id="1-学术实证与瓶颈-3">1. 学术实证与瓶颈</h3>
+<p>这是 BPE 在逻辑与计算任务中最为严峻的局限性。</p>
+<ul>
+<li><strong>文献支撑</strong>：<a target="_blank" rel="noopener" href="https://arxiv.org/abs/2104.14443">Nogueira et al. (2021)</a> 在 <em>Teaching Arithmetic to Small Transformers</em> 中指出，数字在 BPE 下根据统计频率的随意切分（例如将 <code>12345</code> 切为 <code>[123]</code> 和 <code>[45]</code>）是阻碍 Transformer 学会大数泛化计算的根本原因。</li>
+<li><strong>后果</strong>：
+<ol>
+<li><strong>数位无法对齐</strong>：不同数字在输入端被切分成非等长的 token 块，使 Self-Attention 无法建立统一的列式对齐加法。</li>
+<li><strong>数值连续性缺失</strong>：在 Embedding 空间中，模型难以在底层建立起 <code>[123]</code> 与其他数字的数值拓扑关系。</li>
+<li><strong>形态学盲区（Spelling Blindness）</strong>：正如 <a target="_blank" rel="noopener" href="https://arxiv.org/abs/2105.03055">ByT5 (Xue et al., 2021)</a> 所揭示，诸如 <code>strawberry</code> 被 BPE 切分为 <code>['straw', 'berry']</code>，剥夺了模型在前几层直接观测底层字符细节的能力，导致在回文检测、拼写检查等任务上面临天然表征缺陷。</li>
+</ol>
+</li>
+</ul>
+<h3 id="2-工业界改进方案-3">2. 工业界改进方案</h3>
+<ul>
+<li><strong>数字单字符强制切分（Single-digit Split）</strong>：在 LLaMA 3 及 GPT-4 的预分词正则中，强行规定所有数字 <code>0-9</code> 必须保持为独立 token，不允许合并为多位数字。这保证了 <code>12345</code> 在输入层恒表示为 <code>[1][2][3][4][5]</code>，直接使模型具备了高泛化性的数学按位推理能力。</li>
+</ul>
+<hr>
+<h2 id="6-4-前沿演进：无分词器路线（Tokenizer-Free）">6.4 前沿演进：无分词器路线（Tokenizer-Free）</h2>
+<p>为了彻底根除 BPE 等 subword 算法带来的表征偏置与信息流失，学术界正向着无分词器路线演进。</p>
+<ul>
+<li><strong>文献支撑</strong>：<a target="_blank" rel="noopener" href="https://arxiv.org/abs/2401.13660">Wang et al. (2024)</a> 在论文 <em>MambaByte: Token-free Selective State Space Models</em> 中提出了一种完全运行在原始字节流上的无分词器模型。</li>
+<li><strong>核心思想</strong>：直接以单字节（0-255）作为输入。过去，Transformer 面对超长字节序列时受制于 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="script">O</mi><mo stretchy="false">(</mo><msup><mi>N</mi><mn>2</mn></msup><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\mathcal{O}(N^2)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord mathcal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span> 计算复杂度；而伴随具有 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="script">O</mi><mo stretchy="false">(</mo><mi>N</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\mathcal{O}(N)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathcal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="mclose">)</span></span></span></span> 线性复杂度的状态空间模型（SSM，如 Mamba）或线性注意力机制的成熟，无分词器架构可以直接处理极长字节流，消除了分词阶段带来的所有信息熵损失。</li>
+</ul>
+<h2 id="6-5-推理效率：Token-即成本的商业法则">6.5 推理效率：Token 即成本的商业法则</h2>
+<p>在训练阶段可以通过 Scaling Law 弥补分词的瑕疵，但在推理阶段，Token 数量直接决定了商业经济成本：</p>
+<p class="katex-block "><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mtext>推理成本</mtext><mo>∝</mo><mtext>输入 Token 数</mtext><mo>+</mo><mtext>输出 Token 数</mtext></mrow><annotation encoding="application/x-tex">\text{推理成本} \propto \text{输入 Token 数} + \text{输出 Token 数}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord cjk_fallback">推理成本</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∝</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7778em;vertical-align:-0.0833em;"></span><span class="mord text"><span class="mord cjk_fallback">输入</span><span class="mord"> Token </span><span class="mord cjk_fallback">数</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord text"><span class="mord cjk_fallback">输出</span><span class="mord"> Token </span><span class="mord cjk_fallback">数</span></span></span></span></span></span></p>
+<p>每一次 Tokenizer 效率的提升（例如通过扩大词表减少编码后的总序列长度 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi></mrow><annotation encoding="application/x-tex">N</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">N</span></span></span></span>），都直接等价于在推理端降低计算开销、提升吞吐量和减少延迟。这也是当前各大主流模型（OpenAI, DeepSeek 等）持续迭代 Tokenizer 核心正则表达式的底层商业驱动力。</p>
+<h1 id="总结与预告">总结与预告</h1>
+<!-- 回顾全文核心脉络：编码 → 算法 → 证明 → 实现 → 工业 → 前沿。预告下一篇的主题。 -->
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Study-Garden/" class="category-chain-item">Study Garden</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/AI/" class="print-no-link">#AI</a>
+      
+        <a href="/tags/%E6%95%B0%E5%AD%A6/" class="print-no-link">#数学</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>BPE技术详解：LLM的数据处理第一步</div>
+      <div>https://gtilor.github.io/2026/05/22/BPE详解/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>Author</div>
+          <div>GTilor</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>Posted on</div>
+          <div>May 22, 2026</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>Licensed under</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - Attribution">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/05/17/nanogpt%E8%AF%A6%E8%A7%A3/" title="nanoGPT技术详解">
+                        <span class="hidden-mobile">nanoGPT技术详解</span>
+                        <span class="visible-mobile">Next</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="twikoo"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      Fluid.utils.createScript('https://lib.baomitu.com/twikoo/1.6.8/twikoo.all.min.js', function() {
+        var options = Object.assign(
+          {"envId":"https://comments-final.vercel.app","region":"ap-shanghai","path":"window.location.pathname"},
+          {
+            el: '#twikoo',
+            path: 'window.location.pathname',
+            onCommentLoaded: function() {
+              Fluid.utils.listenDOMLoaded(function() {
+                var imgSelector = '#twikoo .tk-content img:not(.tk-owo-emotion)';
+                Fluid.plugins.imageCaption(imgSelector);
+                Fluid.plugins.fancyBox(imgSelector);
+              });
+            }
+          }
+        )
+        twikoo.init(options)
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>Table of Contents</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">Keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <span>© 2026 GTilor </span> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        Views: 
+        <span id="busuanzi_value_site_pv"></span>
+        
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        Visitors: 
+        <span id="busuanzi_value_site_uv"></span>
+        
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    function isExpandAllEnabled() {
+      return CONFIG.toc && CONFIG.toc.expand_all === true;
+    }
+    function expandAllToc() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .tocbot-is-collapsed').removeClass('tocbot-is-collapsed');
+    }
+    function updateTocToggle($li, $childList) {
+      var $toggle = $li.children('.toc-toggle');
+      if ($toggle.length === 0) { return; }
+      var collapsed = $childList.hasClass('tocbot-is-collapsed');
+      $toggle
+        .toggleClass('toc-toggle-collapsed', collapsed)
+        .toggleClass('toc-toggle-expanded', !collapsed);
+    }
+    function bindTocToggle() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .toc-list-item').each(function() {
+        var $li = jQuery(this);
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) {
+          if ($li.children('.toc-toggle').length === 0) {
+            $li.prepend('<span class="toc-toggle toc-toggle-placeholder" aria-hidden="true">›</span>');
+          }
+          return;
+        }
+
+        if ($li.children('.toc-toggle').length === 0) {
+          $li.prepend('<span class="toc-toggle toc-toggle-expanded" aria-hidden="true">›</span>');
+        }
+        updateTocToggle($li, $childList);
+      });
+      jQuery('#toc-body').off('click.tocToggle').on('click.tocToggle', '.toc-toggle', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $li = jQuery(this).parent('.toc-list-item');
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) { return; }
+        $childList.toggleClass('tocbot-is-collapsed');
+        updateTocToggle($li, $childList);
+      });
+      if (!window.__tocToggleObserver) {
+        window.__tocToggleObserver = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type !== 'attributes' || mutation.attributeName !== 'class') { return; }
+            var $list = jQuery(mutation.target);
+            var $li = $list.parent('.toc-list-item');
+            if ($li.length === 0) { return; }
+            updateTocToggle($li, $list);
+          });
+        });
+        jQuery('#toc-body ol').each(function() {
+          window.__tocToggleObserver.observe(this, { attributes: true });
+        });
+      }
+    }
+    var tocConfig = Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc);
+    if (isExpandAllEnabled()) {
+      tocConfig.collapseDepth = 6;
+    }
+    window.tocbot.init(tocConfig);
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+    expandAllToc();
+    bindTocToggle();
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+        expandAllToc();
+        bindTocToggle();
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">Blog works best with JavaScript enabled</div>
+  </noscript>
+</body>
+</html>
