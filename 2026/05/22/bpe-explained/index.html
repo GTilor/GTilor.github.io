@@ -1,7 +1,7 @@
 
 
 <!DOCTYPE html>
-<html lang="en" data-default-color-scheme=auto>
+<html lang="zh-CN" data-default-color-scheme=auto>
 
 
 
@@ -11,23 +11,27 @@
   <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
   <link rel="icon" href="/img/fluid.png">
   
+    <link rel="canonical" href="https://GTilor.github.io/2026/05/22/bpe-explained/"/>
+  
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
   <meta name="theme-color" content="#2f4154">
   <meta name="author" content="GTilor">
-  <meta name="keywords" content="金融、编程、数学">
+  <meta name="keywords" content="AI, LLM, RLHF, DPO, CUDA, 深度学习, 数学, 投资, Hexo">
   
     <meta name="description" content="前言 上一篇blog我们从零拆解了一个nanoGPT，但nanoGPT的每一步都藏着巨大的探究学问，这个博客将讲述如何将我们日常看到的文本转化为机器和模型能看得懂的文本。 一、编码基础：字符如何变成字节流 人类的一切文本，在计算机底层都是一个取值范围为 {0,1,…,255}\{0,1,\dots,255\}{0,1,…,255} 的整数序列。所以问题是如何把字符变成数字呢？其实可以分两步：  1">
 <meta property="og:type" content="article">
 <meta property="og:title" content="BPE技术详解：LLM的数据处理第一步">
-<meta property="og:url" content="https://gtilor.github.io/2026/05/22/BPE%E8%AF%A6%E8%A7%A3/index.html">
+<meta property="og:url" content="https://gtilor.github.io/2026/05/22/bpe-explained/index.html">
 <meta property="og:site_name" content="GTilor的博客空间">
 <meta property="og:description" content="前言 上一篇blog我们从零拆解了一个nanoGPT，但nanoGPT的每一步都藏着巨大的探究学问，这个博客将讲述如何将我们日常看到的文本转化为机器和模型能看得懂的文本。 一、编码基础：字符如何变成字节流 人类的一切文本，在计算机底层都是一个取值范围为 {0,1,…,255}\{0,1,\dots,255\}{0,1,…,255} 的整数序列。所以问题是如何把字符变成数字呢？其实可以分两步：  1">
-<meta property="og:locale" content="en_US">
+<meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2026-05-22T07:45:01.000Z">
-<meta property="article:modified_time" content="2026-06-21T10:09:49.506Z">
+<meta property="article:modified_time" content="2026-06-26T08:59:52.842Z">
 <meta property="article:author" content="GTilor">
 <meta property="article:tag" content="AI">
 <meta property="article:tag" content="数学">
@@ -73,6 +77,10 @@
 
 
 
+  
+<link rel="stylesheet" href="/css/custom.css">
+
+
 
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
@@ -90,7 +98,8 @@
 
 
   
-<meta name="generator" content="Hexo 8.1.1"></head>
+<meta name="generator" content="Hexo 8.1.1"><link rel="alternate" href="/atom.xml" title="GTilor的博客空间" type="application/atom+xml">
+</head>
 
 
 <body>
@@ -251,19 +260,19 @@
             <a href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
               <div class="mobile-grid-item">
                 <i class="iconfont icon-search"></i>
-                <span>Search</span>
+                <span>搜索</span>
               </div>
             </a>
           </div>
         
         
           <div class="col-4 mobile-grid-cell" id="mobile-color-toggle-btn"
-               data-label-light="Light"
-               data-label-dark="Dark">
+               data-label-light="开灯"
+               data-label-dark="关灯">
             <a href="javascript:;" aria-label="Color Toggle">
               <div class="mobile-grid-item">
                 <i class="iconfont icon-dark" id="mobile-color-toggle-icon"></i>
-                <span id="mobile-color-toggle-label">Dark</span>
+                <span id="mobile-color-toggle-label">关灯</span>
               </div>
             </a>
           </div>
@@ -294,7 +303,7 @@
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
         <time datetime="2026-05-22 15:45" pubdate>
-          May 22, 2026 pm
+          2026年5月22日 下午
         </time>
       </span>
     
@@ -305,7 +314,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          8.2k words
+          8.2k 字
         
       </span>
     
@@ -316,12 +325,21 @@
         
         
         
-          69 mins
+          69 分钟
         
       </span>
     
 
     
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+
+      
     
   </div>
 
@@ -356,6 +374,16 @@
         <div id="board">
           <article class="post-content mx-auto">
             <h1 id="seo-header">BPE技术详解：LLM的数据处理第一步</h1>
+            
+              <p id="updated-time" class="note note-info" style="display: none">
+                
+                  
+                    本文最后更新于 2026-06-26T16:59:52+08:00
+                  
+                  
+
+                
+              </p>
             
             
               <div class="markdown-body">
@@ -799,9 +827,9 @@ DeepSeek 的大词表（10万+）正是为了缓解这个问题。
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/AI/" class="print-no-link">#AI</a>
-      
         <a href="/tags/%E6%95%B0%E5%AD%A6/" class="print-no-link">#数学</a>
+      
+        <a href="/tags/AI/" class="print-no-link">#AI</a>
       
     </div>
   
@@ -814,31 +842,36 @@ DeepSeek 的大词表（10万+）正是为了缓解这个问题。
   <div class="license-box my-3">
     <div class="license-title">
       <div>BPE技术详解：LLM的数据处理第一步</div>
-      <div>https://gtilor.github.io/2026/05/22/BPE详解/</div>
+      <div>https://gtilor.github.io/2026/05/22/bpe-explained/</div>
     </div>
     <div class="license-meta">
       
         <div class="license-meta-item">
-          <div>Author</div>
+          <div>作者</div>
           <div>GTilor</div>
         </div>
       
       
         <div class="license-meta-item license-meta-date">
-          <div>Posted on</div>
-          <div>May 22, 2026</div>
+          <div>发布于</div>
+          <div>2026年5月22日</div>
         </div>
       
       
+        <div class="license-meta-item license-meta-date">
+          <div>更新于</div>
+          <div>2026年6月26日</div>
+        </div>
+      
       
         <div class="license-meta-item">
-          <div>Licensed under</div>
+          <div>许可协议</div>
           <div>
             
               
               
                 <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
-                  <span class="hint--top hint--rounded" aria-label="BY - Attribution">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
                     <i class="iconfont icon-cc-by"></i>
                   </span>
                 </a>
@@ -862,9 +895,9 @@ DeepSeek 的大词表（10万+）正是为了缓解这个问题。
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2026/05/17/nanogpt%E8%AF%A6%E8%A7%A3/" title="nanoGPT技术详解">
+                      <a href="/2026/05/17/nanogpt-explained/" title="nanoGPT技术详解">
                         <span class="hidden-mobile">nanoGPT技术详解</span>
-                        <span class="visible-mobile">Next</span>
+                        <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
                     
@@ -918,7 +951,7 @@ DeepSeek 的大词表（10万+）正是为了缓解这个问题。
     <div id="toc">
   <p class="toc-header">
     <i class="iconfont icon-list"></i>
-    <span>Table of Contents</span>
+    <span>目录</span>
   </p>
   <div class="toc-body" id="toc-body"></div>
 </div>
@@ -961,6 +994,21 @@ DeepSeek 的大词表（10万+）正是为了缓解这个问题。
 
 
 
+  <script>
+  Fluid.utils.createScript('https://lib.baomitu.com/mermaid/8.14.0/mermaid.min.js', function() {
+    mermaid.initialize({"theme":"default"});
+
+    Fluid.utils.listenDOMLoaded(function() {
+      Fluid.events.registerRefreshCallback(function() {
+        if ('mermaid' in window) {
+          mermaid.init();
+        }
+      });
+    });
+  });
+</script>
+
+
 
 
 
@@ -979,7 +1027,7 @@ DeepSeek 的大词表（10万+）正是为了缓解这个问题。
   <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header text-center">
-        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
         <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -987,7 +1035,7 @@ DeepSeek 的大词表（10万+）正是为了缓解这个问题。
       <div class="modal-body mx-3">
         <div class="md-form mb-5">
           <input type="text" id="local-search-input" class="form-control validate">
-          <label data-error="x" data-success="v" for="local-search-input">Keyword</label>
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
         </div>
         <div class="list-group" id="local-search-result"></div>
       </div>
@@ -1015,16 +1063,16 @@ DeepSeek 的大词表（10万+）正是为了缓解这个问题。
   
     
       <span id="busuanzi_container_site_pv" style="display: none">
-        Views: 
+        总访问量 
         <span id="busuanzi_value_site_pv"></span>
-        
+         次
       </span>
     
     
       <span id="busuanzi_container_site_uv" style="display: none">
-        Visitors: 
+        总访客数 
         <span id="busuanzi_value_site_uv"></span>
-        
+         人
       </span>
     
     
@@ -1082,6 +1130,33 @@ DeepSeek 的大词表（10万+）正是为了缓解这个问题。
   
 
 
+
+
+  
+<script>
+  var relativeDate = function() {
+    var updatedTime = document.getElementById('updated-time');
+    if (updatedTime) {
+      var text = updatedTime.textContent;
+      var reg = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:Z|[+-]\d{2}:\d{2})/;
+      var matchs = text.match(reg);
+      if (matchs) {
+        var relativeTime = moment(matchs[0]).fromNow();
+        updatedTime.textContent = text.replace(reg, relativeTime);
+      }
+      updatedTime.style.display = '';
+    }
+  };
+  Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/moment.min.js', function() {
+    if (!'zh-cn'.startsWith('en')) {
+      Fluid.utils.createScript('https://lib.baomitu.com/moment.js/2.29.4/locale/zh-cn.min.js', function() {
+        relativeDate();
+      });
+    } else {
+      relativeDate();
+    }
+  });
+</script>
 
 
   
@@ -1248,6 +1323,10 @@ DeepSeek 的大词表（10万+）正是为了缓解这个问题。
 
 
 
+  
+<script src="/js/custom.js"></script>
+
+
 
 <!-- 主题的启动项，将它保持在最底部 -->
 <!-- the boot of the theme, keep it at the bottom -->
@@ -1257,7 +1336,7 @@ DeepSeek 的大词表（10万+）正是为了缓解这个问题。
   
 
   <noscript>
-    <div class="noscript-warning">Blog works best with JavaScript enabled</div>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
   </noscript>
 </body>
 </html>

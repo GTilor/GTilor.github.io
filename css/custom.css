@@ -1,0 +1,155 @@
+/* ============================================
+   Custom CSS for GTilor's Blog
+   Premium enhancements without modifying theme source
+   ============================================ */
+
+/* ---------- 暗色模式平滑过渡 ---------- */
+body, .navbar, .board, .footer, a, .post-content, pre, code {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* ---------- 文章卡片悬浮动效 ---------- */
+.index-post-card {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.index-post-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+}
+
+[data-user-color-scheme="dark"] .index-post-card:hover {
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+}
+
+/* ---------- 代码块 Mac 风格窗口（三色圆点） ---------- */
+figure.highlight {
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+figure.highlight::before {
+  content: "";
+  display: block;
+  height: 32px;
+  background: linear-gradient(135deg, #2d2d2d 0%, #1e1e1e 100%);
+  background-image:
+    radial-gradient(circle 6px, #ff5f56 45%, transparent 45%),
+    radial-gradient(circle 6px, #ffbd2e 45%, transparent 45%),
+    radial-gradient(circle 6px, #27ca40 45%, transparent 45%);
+  background-position: 14px center, 36px center, 58px center;
+  background-repeat: no-repeat;
+  background-size: 14px 14px, 14px 14px, 14px 14px;
+}
+
+[data-user-color-scheme="dark"] figure.highlight {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* ---------- 引用块左边框渐变动画 ---------- */
+blockquote {
+  border-left-width: 4px;
+  border-left-style: solid;
+  border-image: linear-gradient(180deg, #0366d6, #30a9de, #0366d6) 1;
+  border-radius: 0 8px 8px 0;
+  background: rgba(3, 102, 214, 0.03);
+  transition: transform 0.3s ease;
+}
+
+blockquote:hover {
+  transform: translateX(4px);
+}
+
+/* ---------- 分隔线渐变 ---------- */
+hr {
+  border: none;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #0366d6, #30a9de, #0366d6, transparent);
+  margin: 2em 0;
+}
+
+/* ---------- 图片加载淡入 ---------- */
+img {
+  transition: opacity 0.5s ease;
+}
+
+img[loading="lazy"] {
+  opacity: 0;
+}
+
+img[loading="lazy"].loaded {
+  opacity: 1;
+}
+
+/* ---------- 链接下划线动画 ---------- */
+.post-content a:not(.fancybox):not([class*="btn"]) {
+  text-decoration: none;
+  background-image: linear-gradient(currentColor, currentColor);
+  background-position: 0% 100%;
+  background-repeat: no-repeat;
+  background-size: 0% 1px;
+  transition: background-size 0.3s ease;
+}
+
+.post-content a:not(.fancybox):not([class*="btn"]):hover {
+  background-size: 100% 1px;
+}
+
+/* ---------- 标题微调 ---------- */
+.post-content h2 {
+  padding-bottom: 0.3em;
+  border-bottom: 1px solid var(--line-color, #eaecef);
+  margin-top: 1.8em;
+}
+
+.post-content h3 {
+  margin-top: 1.5em;
+}
+
+/* ---------- 表格美化 ---------- */
+.post-content table {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.post-content th {
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+/* ---------- 返回顶部按钮动画 ---------- */
+.scroll-top-btn {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.3s ease,
+              box-shadow 0.3s ease;
+}
+
+.scroll-top-btn:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* ---------- 导航栏阴影增强 ---------- */
+.navbar {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+[data-user-color-scheme="dark"] .navbar {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* ---------- 搜索弹窗优化 ---------- */
+.search-dialog {
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+}
+
+/* ---------- 暗色模式下代码块窗口栏适配 ---------- */
+[data-user-color-scheme="dark"] figure.highlight::before {
+  background: linear-gradient(135deg, #1e1e1e 0%, #161616 100%);
+}
