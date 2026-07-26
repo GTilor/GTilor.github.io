@@ -1,155 +1,271 @@
 /* ============================================
-   Custom CSS for GTilor's Blog
-   Premium enhancements without modifying theme source
+   Academic Minimalist Style for GTilor's Blog
+   Clean, readable, content-focused design
    ============================================ */
 
-/* ---------- 暗色模式平滑过渡 ---------- */
-body, .navbar, .board, .footer, a, .post-content, pre, code {
-  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+/* ---------- Google Fonts Import ---------- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* ---------- Global Transitions (dark mode only) ---------- */
+body, .navbar, .board, .footer {
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* ---------- 文章卡片悬浮动效 ---------- */
-.index-post-card {
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-              box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  border-radius: 12px;
-  overflow: hidden;
+/* ---------- Content Width Constraint ---------- */
+/* Paper-style reading width: ~780px for optimal readability */
+.post-content {
+  max-width: 780px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-.index-post-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+/* ---------- Typography ---------- */
+.post-content {
+  line-height: 1.8;
+  font-size: 17px;
 }
 
-[data-user-color-scheme="dark"] .index-post-card:hover {
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+.post-content p {
+  margin-bottom: 1.4em;
 }
 
-/* ---------- 代码块 Mac 风格窗口（三色圆点） ---------- */
+.post-content h1 {
+  margin-top: 2.2em;
+  margin-bottom: 0.8em;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.post-content h2 {
+  padding-bottom: 0.3em;
+  border-bottom: 1px solid var(--line-color, #e5e7eb);
+  margin-top: 2em;
+  margin-bottom: 0.8em;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.post-content h3 {
+  margin-top: 1.6em;
+  margin-bottom: 0.6em;
+  font-weight: 600;
+}
+
+.post-content h4, .post-content h5, .post-content h6 {
+  margin-top: 1.4em;
+  margin-bottom: 0.5em;
+  font-weight: 600;
+}
+
+/* ---------- Code Blocks ---------- */
+code, pre, .hljs {
+  font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', Consolas, monospace;
+}
+
 figure.highlight {
-  border-radius: 10px;
+  border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  margin: 1.5em 0;
 }
 
 figure.highlight::before {
   content: "";
   display: block;
-  height: 32px;
-  background: linear-gradient(135deg, #2d2d2d 0%, #1e1e1e 100%);
+  height: 30px;
+  background: #2d2d2d;
   background-image:
-    radial-gradient(circle 6px, #ff5f56 45%, transparent 45%),
-    radial-gradient(circle 6px, #ffbd2e 45%, transparent 45%),
-    radial-gradient(circle 6px, #27ca40 45%, transparent 45%);
-  background-position: 14px center, 36px center, 58px center;
+    radial-gradient(circle 5px, #ff5f56 45%, transparent 45%),
+    radial-gradient(circle 5px, #ffbd2e 45%, transparent 45%),
+    radial-gradient(circle 5px, #27ca40 45%, transparent 45%);
+  background-position: 12px center, 30px center, 48px center;
   background-repeat: no-repeat;
-  background-size: 14px 14px, 14px 14px, 14px 14px;
+  background-size: 12px 12px, 12px 12px, 12px 12px;
 }
 
 [data-user-color-scheme="dark"] figure.highlight {
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
 }
 
-/* ---------- 引用块左边框渐变动画 ---------- */
+[data-user-color-scheme="dark"] figure.highlight::before {
+  background-color: #1e1e1e;
+}
+
+/* Inline code */
+.post-content code:not([class*="hljs"]):not(pre code) {
+  background-color: #f3f4f6;
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  font-size: 0.88em;
+}
+
+[data-user-color-scheme="dark"] .post-content code:not([class*="hljs"]):not(pre code) {
+  background-color: #2a2a4a;
+}
+
+/* ---------- Article Cards (Index Page) ---------- */
+/* Minimal list style: no shadows, no rounded corners, no hover lift */
+.index-post-card {
+  border-radius: 4px;
+  box-shadow: none;
+  border: 1px solid var(--line-color, #e5e7eb);
+  transition: border-color 0.2s ease;
+}
+
+.index-post-card:hover {
+  transform: none;
+  box-shadow: none;
+  border-color: #2563eb;
+}
+
+[data-user-color-scheme="dark"] .index-post-card {
+  border-color: var(--line-color, #3a3a5c);
+}
+
+[data-user-color-scheme="dark"] .index-post-card:hover {
+  border-color: #60a5fa;
+}
+
+/* ---------- Blockquotes ---------- */
 blockquote {
-  border-left-width: 4px;
-  border-left-style: solid;
-  border-image: linear-gradient(180deg, #0366d6, #30a9de, #0366d6) 1;
-  border-radius: 0 8px 8px 0;
-  background: rgba(3, 102, 214, 0.03);
-  transition: transform 0.3s ease;
+  border-left: 3px solid #d1d5db;
+  border-radius: 0;
+  background: transparent;
+  padding-left: 1em;
+  color: #555;
+  font-style: italic;
 }
 
+[data-user-color-scheme="dark"] blockquote {
+  border-left-color: #4a4a6a;
+  color: #999;
+}
+
+/* No hover animation on blockquotes */
 blockquote:hover {
-  transform: translateX(4px);
+  transform: none;
 }
 
-/* ---------- 分隔线渐变 ---------- */
+/* ---------- Horizontal Rules ---------- */
 hr {
   border: none;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, #0366d6, #30a9de, #0366d6, transparent);
+  height: 1px;
+  background: var(--line-color, #e5e7eb);
   margin: 2em 0;
 }
 
-/* ---------- 图片加载淡入 ---------- */
-img {
-  transition: opacity 0.5s ease;
-}
-
-img[loading="lazy"] {
-  opacity: 0;
-}
-
-img[loading="lazy"].loaded {
-  opacity: 1;
-}
-
-/* ---------- 链接下划线动画 ---------- */
+/* ---------- Links ---------- */
 .post-content a:not(.fancybox):not([class*="btn"]) {
   text-decoration: none;
-  background-image: linear-gradient(currentColor, currentColor);
-  background-position: 0% 100%;
-  background-repeat: no-repeat;
-  background-size: 0% 1px;
-  transition: background-size 0.3s ease;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s ease;
 }
 
 .post-content a:not(.fancybox):not([class*="btn"]):hover {
-  background-size: 100% 1px;
+  border-bottom-color: currentColor;
 }
 
-/* ---------- 标题微调 ---------- */
-.post-content h2 {
-  padding-bottom: 0.3em;
-  border-bottom: 1px solid var(--line-color, #eaecef);
-  margin-top: 1.8em;
+/* ---------- Navigation Bar ---------- */
+.navbar {
+  box-shadow: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.post-content h3 {
-  margin-top: 1.5em;
+[data-user-color-scheme="dark"] .navbar {
+  box-shadow: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-/* ---------- 表格美化 ---------- */
+/* ---------- Tables ---------- */
 .post-content table {
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  border-radius: 0;
+  box-shadow: none;
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1.5em 0;
 }
 
 .post-content th {
   font-weight: 600;
-  letter-spacing: 0.02em;
+  text-align: left;
+  border-bottom: 2px solid var(--line-color, #e5e7eb);
 }
 
-/* ---------- 返回顶部按钮动画 ---------- */
+.post-content td {
+  border-bottom: 1px solid var(--line-color, #e5e7eb);
+}
+
+/* ---------- Images ---------- */
+img {
+  transition: opacity 0.4s ease;
+}
+
+.post-content img {
+  border-radius: 4px;
+}
+
+/* ---------- Return to Top Button ---------- */
 .scroll-top-btn {
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-              opacity 0.3s ease,
-              box-shadow 0.3s ease;
+  transition: opacity 0.2s ease;
+  border-radius: 4px;
 }
 
 .scroll-top-btn:hover {
-  transform: translateY(-3px) scale(1.05);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  transform: none;
+  box-shadow: none;
 }
 
-/* ---------- 导航栏阴影增强 ---------- */
-.navbar {
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-}
-
-[data-user-color-scheme="dark"] .navbar {
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
-}
-
-/* ---------- 搜索弹窗优化 ---------- */
+/* ---------- Search Dialog ---------- */
 .search-dialog {
-  border-radius: 16px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
 }
 
-/* ---------- 暗色模式下代码块窗口栏适配 ---------- */
-[data-user-color-scheme="dark"] figure.highlight::before {
-  background: linear-gradient(135deg, #1e1e1e 0%, #161616 100%);
+/* ---------- Footer ---------- */
+.footer {
+  font-size: 0.85em;
+  opacity: 0.8;
+}
+
+/* ---------- Banner Area Refinement ---------- */
+/* Make small banners feel intentional, not cramped */
+#banner {
+  min-height: auto;
+}
+
+#banner .banner-text {
+  padding: 0;
+}
+
+/* Subtitle in banner: clean, no shadow */
+#subtitle {
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  text-shadow: none;
+  font-size: 1.1rem;
+}
+
+/* Banner title */
+#banner h2 {
+  font-weight: 600;
+  text-shadow: none;
+}
+
+/* ---------- KaTeX Formula Spacing ---------- */
+.katex-display {
+  margin: 1.5em 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+/* ---------- Mobile Responsive Adjustments ---------- */
+@media (max-width: 768px) {
+  .post-content {
+    font-size: 16px;
+    line-height: 1.75;
+  }
+
+  .post-content h2 {
+    margin-top: 1.6em;
+  }
 }

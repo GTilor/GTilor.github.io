@@ -1,12 +1,12 @@
 /* ============================================
    Custom JS for GTilor's Blog
-   Premium interactions without modifying theme source
+   Minimal enhancements for academic style
    ============================================ */
 
 (function () {
   "use strict";
 
-  // ---------- TOC 当前章节高亮跟随 (Intersection Observer) ----------
+  // ---------- TOC active section tracking (Intersection Observer) ----------
   function initTocObserver() {
     var tocLinks = document.querySelectorAll(".tocbot-link");
     if (!tocLinks.length) return;
@@ -26,11 +26,9 @@
         if (entry.isIntersecting) {
           var id = entry.target.getAttribute("id");
           if (!id) return;
-          // Remove active from all
           tocLinks.forEach(function (link) {
             link.classList.remove("is-active-link");
           });
-          // Add active to matching link
           var activeLink = document.querySelector('.tocbot-link[href="#' + CSS.escape(id) + '"]');
           if (activeLink) {
             activeLink.classList.add("is-active-link");
@@ -44,66 +42,29 @@
     });
   }
 
-  // ---------- 图片加载淡入 ----------
+  // ---------- Image fade-in on load ----------
   function initImageFadeIn() {
     var images = document.querySelectorAll("img[loading='lazy'], img[data-src]");
     if (!images.length) return;
 
-    if ("IntersectionObserver" in window) {
-      var imgObserver = new IntersectionObserver(
-        function (entries) {
-          entries.forEach(function (entry) {
-            if (entry.isIntersecting) {
-              var img = entry.target;
-              img.addEventListener("load", function () {
-                img.classList.add("loaded");
-              });
-              // If image is already loaded (cached)
-              if (img.complete) {
-                img.classList.add("loaded");
-              }
-              imgObserver.unobserve(img);
-            }
-          });
-        },
-        { rootMargin: "100px" }
-      );
-
-      images.forEach(function (img) {
-        img.classList.add("loaded"); // Fallback: show immediately
-        imgObserver.observe(img);
-      });
-    } else {
-      // Fallback for browsers without IntersectionObserver
-      images.forEach(function (img) {
-        img.classList.add("loaded");
-      });
-    }
+    images.forEach(function (img) {
+      if (img.complete) {
+        img.style.opacity = "1";
+      } else {
+        img.style.opacity = "0";
+        img.addEventListener("load", function () {
+          img.style.opacity = "1";
+        });
+      }
+    });
   }
 
-  // ---------- Banner 副标题打字机光标优化 ----------
-  function enhanceTypingCursor() {
-    var typedCursor = document.querySelector(".typed-cursor");
-    if (typedCursor) {
-      typedCursor.style.animation = "typedjsBlink 0.7s infinite";
-      typedCursor.style.fontWeight = "300";
-      typedCursor.style.color = "var(--subtitle-color, #fff)";
-    }
-  }
-
-  // ---------- Run all enhancements ----------
+  // ---------- Initialize ----------
   document.addEventListener("DOMContentLoaded", function () {
-    // TOC observer - wait a bit for tocbot to finish rendering
     setTimeout(initTocObserver, 500);
-
-    // Image fade-in
     initImageFadeIn();
-
-    // Typing cursor enhancement
-    enhanceTypingCursor();
   });
 
-  // Re-run TOC observer after potential dynamic content changes
   window.addEventListener("load", function () {
     setTimeout(initTocObserver, 300);
   });

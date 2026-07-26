@@ -9,7 +9,9 @@
   <link href="https://gtilor.github.io/" rel="alternate"/>
   <link href="https://gtilor.github.io/atom.xml" rel="self"/>
   <rights>All rights reserved 2026, GTilor</rights>
-  <subtitle>Keep learning.</subtitle>
+  <subtitle>
+    <![CDATA[Mathematics, AI & Investment]]>
+  </subtitle>
   <title>GTilor的博客空间</title>
   <updated>2026-06-26T08:59:52.842Z</updated>
   <entry>

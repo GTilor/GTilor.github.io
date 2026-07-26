@@ -28,19 +28,6 @@ h6:hover > .anchorjs-link {
   -webkit-backface-visibility: hidden;
   transition: transform 0.05s ease-out;
 }
-@media (max-width: 100vh) {
-  .header-inner {
-    max-height: 100vw;
-  }
-  #board {
-    margin-top: -1rem !important;
-  }
-}
-@media (max-width: 79.99vh) {
-  .scroll-down-bar {
-    display: none;
-  }
-}
 #board {
   position: relative;
   margin-top: -2rem;
@@ -430,21 +417,10 @@ sup > a::before,
   -o-transform: rotate(-135deg);
   transform: rotate(-135deg);
 }
-@supports (-webkit-backdrop-filter: blur(3px)) or (backdrop-filter: blur(3px)) {
-  .navbar .dropdown-collapse,
-  .top-nav-collapse,
-  .navbar-col-show {
-    background: rgba(47,65,84,0.7);
-    -webkit-backdrop-filter: blur(3px);
-    backdrop-filter: blur(3px);
-  }
-}
-@supports not ((-webkit-backdrop-filter: blur(3px)) or (backdrop-filter: blur(3px))) {
-  .navbar .dropdown-collapse,
-  .top-nav-collapse,
-  .navbar-col-show {
-    background: #2f4154;
-  }
+.navbar .dropdown-collapse,
+.top-nav-collapse,
+.navbar-col-show {
+  background-color: var(--navbar-bg-color);
 }
 @media (max-width: 767px) {
   .navbar {
@@ -491,20 +467,7 @@ sup > a::before,
   transform: translateY(-12px);
   transition: opacity 0.18s ease, transform 0.18s ease;
   will-change: opacity, transform;
-/* 若浏览器支持 backdrop-filter，则启用毛玻璃 */
-/* 若浏览器器不支持，则使用透明 */
-}
-@supports (-webkit-backdrop-filter: blur(3px)) or (backdrop-filter: blur(3px)) {
-  #mobile-grid-menu {
-    background: rgba(47,65,84,0.7);
-    -webkit-backdrop-filter: blur(3px);
-    backdrop-filter: blur(3px);
-  }
-}
-@supports not ((-webkit-backdrop-filter: blur(3px)) or (backdrop-filter: blur(3px))) {
-  #mobile-grid-menu {
-    background: #2f4154;
-  }
+  background-color: var(--navbar-bg-color);
 }
 #mobile-grid-menu.show {
   pointer-events: auto;
@@ -911,13 +874,13 @@ sup > a::before,
   padding: 3rem 0;
 }
 html {
-  font-size: 16px;
-  letter-spacing: 0.02em;
+  font-size: 17px;
+  letter-spacing: 0.01em;
 }
 html,
 body {
   height: 100%;
-  font-family: PingFang SC, Noto Sans SC, Microsoft YaHei, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, sans-serif;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, PingFang SC, Noto Sans SC, Microsoft YaHei, Segoe UI, Roboto, Helvetica Neue, sans-serif;
   overflow-wrap: break-word;
 }
 body {
@@ -983,75 +946,59 @@ body.mobile-menu-open {
 }
 :root {
   --color-mode: "light";
-  --body-bg-color: #eee;
-  --board-bg-color: #fff;
-  --text-color: #3c4858;
-  --sec-text-color: #718096;
-  --post-text-color: #2c3e50;
-  --post-heading-color: #1a202c;
-  --post-link-color: #0366d6;
-  --link-hover-color: #30a9de;
-  --link-hover-bg-color: #f8f9fa;
-  --line-color: #eaecef;
-  --navbar-bg-color: #2f4154;
-  --navbar-text-color: #fff;
-  --subtitle-color: #fff;
-  --scrollbar-color: #c4c6c9;
-  --scrollbar-hover-color: #a6a6a6;
+  --body-bg-color: #ffffff;
+  --board-bg-color: #ffffff;
+  --text-color: #333333;
+  --sec-text-color: #666666;
+  --post-text-color: #1a1a1a;
+  --post-heading-color: #111111;
+  --post-link-color: #2563eb;
+  --link-hover-color: #1d4ed8;
+  --link-hover-bg-color: #f5f5f5;
+  --line-color: #e5e7eb;
+  --navbar-bg-color: #1a1a2e;
+  --navbar-text-color: #e0e0e0;
+  --subtitle-color: #e0e0e0;
+  --scrollbar-color: #d1d5db;
+  --scrollbar-hover-color: #9ca3af;
   --button-bg-color: transparent;
-  --button-hover-bg-color: #f2f3f5;
+  --button-hover-bg-color: #f3f4f6;
   --highlight-bg-color: #f6f8fa;
   --inlinecode-bg-color: rgba(175,184,193,0.2);
-  --fold-title-color: #3c4858;
-  --fold-border-color: #eaecef;
+  --fold-title-color: #333333;
+  --fold-border-color: #e5e7eb;
 }
 @media (prefers-color-scheme: dark) {
   :root {
     --color-mode: "dark";
   }
   :root:not([data-user-color-scheme]) {
-    --body-bg-color: #181c27;
-    --board-bg-color: #252d38;
+    --body-bg-color: #1a1a2e;
+    --board-bg-color: #1e1e36;
     --text-color: #c4c6c9;
     --sec-text-color: #a7a9ad;
     --post-text-color: #c4c6c9;
-    --post-heading-color: #c4c6c9;
-    --post-link-color: #1589e9;
-    --link-hover-color: #30a9de;
-    --link-hover-bg-color: #364151;
-    --line-color: #435266;
-    --navbar-bg-color: #1f3144;
+    --post-heading-color: #e0e0e0;
+    --post-link-color: #60a5fa;
+    --link-hover-color: #93bbfd;
+    --link-hover-bg-color: #2a2a4a;
+    --line-color: #3a3a5c;
+    --navbar-bg-color: #16162a;
     --navbar-text-color: #d0d0d0;
     --subtitle-color: #d0d0d0;
-    --scrollbar-color: #687582;
-    --scrollbar-hover-color: #9da8b3;
+    --scrollbar-color: #4a4a6a;
+    --scrollbar-hover-color: #6a6a8a;
     --button-bg-color: transparent;
-    --button-hover-bg-color: #46647e;
+    --button-hover-bg-color: #2a2a4a;
     --highlight-bg-color: #303030;
     --inlinecode-bg-color: rgba(99,110,123,0.4);
     --fold-title-color: #c4c6c9;
-    --fold-border-color: #435266;
+    --fold-border-color: #3a3a5c;
   }
   :root:not([data-user-color-scheme]) img {
     -webkit-filter: brightness(0.9);
     filter: brightness(0.9);
     transition: filter 0.2s ease-in-out;
-  }
-  @supports (-webkit-backdrop-filter: blur(3px)) or (backdrop-filter: blur(3px)) {
-    :root:not([data-user-color-scheme]) .navbar .dropdown-collapse,
-    :root:not([data-user-color-scheme]) .top-nav-collapse,
-    :root:not([data-user-color-scheme]) .navbar-col-show {
-      background: rgba(31,49,68,0.7);
-      -webkit-backdrop-filter: blur(3px);
-      backdrop-filter: blur(3px);
-    }
-  }
-  @supports not ((-webkit-backdrop-filter: blur(3px)) or (backdrop-filter: blur(3px))) {
-    :root:not([data-user-color-scheme]) .navbar .dropdown-collapse,
-    :root:not([data-user-color-scheme]) .top-nav-collapse,
-    :root:not([data-user-color-scheme]) .navbar-col-show {
-      background: #1f3144;
-    }
   }
   :root:not([data-user-color-scheme]) .license-box {
     background-color: rgba(62,75,94,0.35);
@@ -1064,48 +1011,32 @@ body.mobile-menu-open {
 }
 @media not print {
   [data-user-color-scheme="dark"] {
-    --body-bg-color: #181c27;
-    --board-bg-color: #252d38;
+    --body-bg-color: #1a1a2e;
+    --board-bg-color: #1e1e36;
     --text-color: #c4c6c9;
     --sec-text-color: #a7a9ad;
     --post-text-color: #c4c6c9;
-    --post-heading-color: #c4c6c9;
-    --post-link-color: #1589e9;
-    --link-hover-color: #30a9de;
-    --link-hover-bg-color: #364151;
-    --line-color: #435266;
-    --navbar-bg-color: #1f3144;
+    --post-heading-color: #e0e0e0;
+    --post-link-color: #60a5fa;
+    --link-hover-color: #93bbfd;
+    --link-hover-bg-color: #2a2a4a;
+    --line-color: #3a3a5c;
+    --navbar-bg-color: #16162a;
     --navbar-text-color: #d0d0d0;
     --subtitle-color: #d0d0d0;
-    --scrollbar-color: #687582;
-    --scrollbar-hover-color: #9da8b3;
+    --scrollbar-color: #4a4a6a;
+    --scrollbar-hover-color: #6a6a8a;
     --button-bg-color: transparent;
-    --button-hover-bg-color: #46647e;
+    --button-hover-bg-color: #2a2a4a;
     --highlight-bg-color: #303030;
     --inlinecode-bg-color: rgba(99,110,123,0.4);
     --fold-title-color: #c4c6c9;
-    --fold-border-color: #435266;
+    --fold-border-color: #3a3a5c;
   }
   [data-user-color-scheme="dark"] img {
     -webkit-filter: brightness(0.9);
     filter: brightness(0.9);
     transition: filter 0.2s ease-in-out;
-  }
-  @supports (-webkit-backdrop-filter: blur(3px)) or (backdrop-filter: blur(3px)) {
-    [data-user-color-scheme="dark"] .navbar .dropdown-collapse,
-    [data-user-color-scheme="dark"] .top-nav-collapse,
-    [data-user-color-scheme="dark"] .navbar-col-show {
-      background: rgba(31,49,68,0.7);
-      -webkit-backdrop-filter: blur(3px);
-      backdrop-filter: blur(3px);
-    }
-  }
-  @supports not ((-webkit-backdrop-filter: blur(3px)) or (backdrop-filter: blur(3px))) {
-    [data-user-color-scheme="dark"] .navbar .dropdown-collapse,
-    [data-user-color-scheme="dark"] .top-nav-collapse,
-    [data-user-color-scheme="dark"] .navbar-col-show {
-      background: #1f3144;
-    }
   }
   [data-user-color-scheme="dark"] .license-box {
     background-color: rgba(62,75,94,0.35);
@@ -1613,7 +1544,7 @@ figure.highlight td.code > pre {
 .markdown-body {
   font-size: 1rem;
   line-height: 1.6;
-  font-family: PingFang SC, Noto Sans SC, Microsoft YaHei, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, sans-serif;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, PingFang SC, Noto Sans SC, Microsoft YaHei, Segoe UI, Roboto, Helvetica Neue, sans-serif;
   margin-bottom: 2rem;
   color: var(--post-text-color);
 }
