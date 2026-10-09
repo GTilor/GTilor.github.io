@@ -1,0 +1,153 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 900" font-family="Arial, sans-serif">
+  <defs>
+    <linearGradient id="blockGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#4A90D9"/>
+      <stop offset="100%" stop-color="#357ABD"/>
+    </linearGradient>
+    <linearGradient id="embedGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#E8A838"/>
+      <stop offset="100%" stop-color="#D4922A"/>
+    </linearGradient>
+    <linearGradient id="headGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#5CB85C"/>
+      <stop offset="100%" stop-color="#4A9A4A"/>
+    </linearGradient>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="2" dy="2" stdDeviation="3" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+
+  <!-- Title -->
+  <text x="400" y="40" text-anchor="middle" font-size="24" font-weight="bold" fill="#333">GPT 模型前向传播架构</text>
+
+  <!-- Input -->
+  <rect x="300" y="70" width="200" height="50" rx="8" fill="#F5F5F5" stroke="#999" stroke-width="2" filter="url(#shadow)"/>
+  <text x="400" y="100" text-anchor="middle" font-size="14" fill="#333">输入 token IDs (B, T)</text>
+
+  <!-- Arrow down -->
+  <line x1="400" y1="120" x2="400" y2="150" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#666"/>
+    </marker>
+  </defs>
+
+  <!-- Token Embedding -->
+  <rect x="150" y="160" width="180" height="60" rx="8" fill="url(#embedGrad)" filter="url(#shadow)"/>
+  <text x="240" y="187" text-anchor="middle" font-size="13" fill="white" font-weight="bold">Token Embedding</text>
+  <text x="240" y="207" text-anchor="middle" font-size="11" fill="#FFF8">wte: vocab → n_embd</text>
+
+  <!-- Position Embedding -->
+  <rect x="470" y="160" width="180" height="60" rx="8" fill="url(#embedGrad)" filter="url(#shadow)"/>
+  <text x="560" y="187" text-anchor="middle" font-size="13" fill="white" font-weight="bold">Position Embedding</text>
+  <text x="560" y="207" text-anchor="middle" font-size="11" fill="#FFF8">wpe: block → n_embd</text>
+
+  <!-- Merge arrows -->
+  <line x1="240" y1="220" x2="370" y2="250" stroke="#666" stroke-width="2"/>
+  <line x1="560" y1="220" x2="430" y2="250" stroke="#666" stroke-width="2"/>
+
+  <!-- Add + Dropout -->
+  <rect x="300" y="250" width="200" height="45" rx="8" fill="#F5F5F5" stroke="#E8A838" stroke-width="2" filter="url(#shadow)"/>
+  <text x="400" y="278" text-anchor="middle" font-size="13" fill="#333">相加 + Dropout</text>
+
+  <!-- Arrow down -->
+  <line x1="400" y1="295" x2="400" y2="325" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- Block repeat indicator -->
+  <rect x="120" y="330" width="560" height="250" rx="12" fill="none" stroke="#4A90D9" stroke-width="2" stroke-dasharray="8,4"/>
+  <text x="140" y="352" font-size="14" fill="#4A90D9" font-weight="bold">× n_layer (12)</text>
+
+  <!-- LayerNorm 1 -->
+  <rect x="160" y="365" width="130" height="40" rx="6" fill="#9B59B6" filter="url(#shadow)"/>
+  <text x="225" y="390" text-anchor="middle" font-size="12" fill="white" font-weight="bold">LayerNorm</text>
+
+  <!-- Arrow -->
+  <line x1="290" y1="385" x2="320" y2="385" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- CausalSelfAttention -->
+  <rect x="330" y="355" width="200" height="60" rx="8" fill="url(#blockGrad)" filter="url(#shadow)"/>
+  <text x="430" y="380" text-anchor="middle" font-size="13" fill="white" font-weight="bold">CausalSelfAttention</text>
+  <text x="430" y="400" text-anchor="middle" font-size="11" fill="#FFF8">Q, K, V → 多头注意力</text>
+
+  <!-- Residual arrow -->
+  <line x1="130" y1="385" x2="130" y2="440" stroke="#E74C3C" stroke-width="2" stroke-dasharray="5,3"/>
+  <line x1="130" y1="440" x2="320" y2="440" stroke="#E74C3C" stroke-width="2" stroke-dasharray="5,3" marker-end="url(#arrowRed)"/>
+  <text x="110" y="420" font-size="11" fill="#E74C3C" text-anchor="end">残差</text>
+  <defs>
+    <marker id="arrowRed" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#E74C3C"/>
+    </marker>
+  </defs>
+
+  <!-- Residual Add 1 -->
+  <rect x="330" y="430" width="200" height="35" rx="6" fill="#F5F5F5" stroke="#E74C3C" stroke-width="1.5"/>
+  <text x="430" y="452" text-anchor="middle" font-size="12" fill="#E74C3C">+ 残差连接</text>
+
+  <!-- Arrow -->
+  <line x1="430" y1="465" x2="430" y2="485" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- LayerNorm 2 -->
+  <rect x="160" y="480" width="130" height="40" rx="6" fill="#9B59B6" filter="url(#shadow)"/>
+  <text x="225" y="505" text-anchor="middle" font-size="12" fill="white" font-weight="bold">LayerNorm</text>
+
+  <!-- Arrow -->
+  <line x1="290" y1="500" x2="320" y2="500" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- MLP -->
+  <rect x="330" y="485" width="200" height="50" rx="8" fill="url(#blockGrad)" filter="url(#shadow)"/>
+  <text x="430" y="507" text-anchor="middle" font-size="13" fill="white" font-weight="bold">MLP (前馈网络)</text>
+  <text x="430" y="525" text-anchor="middle" font-size="11" fill="#FFF8">Linear → GELU → Linear</text>
+
+  <!-- Residual arrow 2 -->
+  <line x1="130" y1="440" x2="130" y2="535" stroke="#E74C3C" stroke-width="2" stroke-dasharray="5,3"/>
+  <line x1="130" y1="535" x2="320" y2="535" stroke="#E74C3C" stroke-width="2" stroke-dasharray="5,3" marker-end="url(#arrowRed)"/>
+
+  <!-- Residual Add 2 -->
+  <rect x="330" y="545" width="200" height="35" rx="6" fill="#F5F5F5" stroke="#E74C3C" stroke-width="1.5"/>
+  <text x="430" y="567" text-anchor="middle" font-size="12" fill="#E74C3C">+ 残差连接</text>
+
+  <!-- Arrow out of block -->
+  <line x1="430" y1="580" x2="430" y2="600" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- Final LayerNorm -->
+  <rect x="300" y="605" width="200" height="45" rx="8" fill="#9B59B6" filter="url(#shadow)"/>
+  <text x="400" y="633" text-anchor="middle" font-size="13" fill="white" font-weight="bold">最终 LayerNorm</text>
+
+  <!-- Arrow -->
+  <line x1="400" y1="650" x2="400" y2="680" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- LM Head -->
+  <rect x="300" y="690" width="200" height="50" rx="8" fill="url(#headGrad)" filter="url(#shadow)"/>
+  <text x="400" y="715" text-anchor="middle" font-size="13" fill="white" font-weight="bold">lm_head (输出层)</text>
+  <text x="400" y="730" text-anchor="middle" font-size="11" fill="#FFF8">n_embd → vocab_size</text>
+
+  <!-- Arrow -->
+  <line x1="400" y1="740" x2="400" y2="770" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- Output -->
+  <rect x="275" y="780" width="250" height="55" rx="8" fill="#F5F5F5" stroke="#999" stroke-width="2" filter="url(#shadow)"/>
+  <text x="400" y="805" text-anchor="middle" font-size="13" fill="#333">logits (B, T, vocab_size)</text>
+  <text x="400" y="825" text-anchor="middle" font-size="11" fill="#666">→ cross_entropy (训练) / softmax+采样 (推理)</text>
+
+  <!-- Parameter legend -->
+  <rect x="580" y="160" width="200" height="200" rx="8" fill="#FAFAFA" stroke="#DDD" stroke-width="1"/>
+  <text x="680" y="185" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">参数说明</text>
+  <text x="600" y="210" font-size="12" fill="#555">vocab_size: 词表大小 (65)</text>
+  <text x="600" y="232" font-size="12" fill="#555">n_embd: 向量维度 (128)</text>
+  <text x="600" y="254" font-size="12" fill="#555">block_size: 上下文长度 (256)</text>
+  <text x="600" y="276" font-size="12" fill="#555">n_layer: Block 层数 (4)</text>
+  <text x="600" y="298" font-size="12" fill="#555">n_head: 注意力头数 (4)</text>
+  <text x="600" y="320" font-size="12" fill="#555">B=batch, T=序列长度</text>
+
+  <!-- Color legend -->
+  <rect x="580" y="380" width="200" height="130" rx="8" fill="#FAFAFA" stroke="#DDD" stroke-width="1"/>
+  <text x="680" y="405" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">图例</text>
+  <rect x="600" y="420" width="16" height="16" rx="3" fill="#E8A838"/>
+  <text x="625" y="433" font-size="12" fill="#555">Embedding 层</text>
+  <rect x="600" y="445" width="16" height="16" rx="3" fill="#4A90D9"/>
+  <text x="625" y="458" font-size="12" fill="#555">Transformer Block</text>
+  <rect x="600" y="470" width="16" height="16" rx="3" fill="#9B59B6"/>
+  <text x="625" y="483" font-size="12" fill="#555">LayerNorm</text>
+  <rect x="600" y="495" width="16" height="16" rx="3" fill="#5CB85C"/>
+  <text x="625" y="508" font-size="12" fill="#555">输出层</text>
+</svg>
